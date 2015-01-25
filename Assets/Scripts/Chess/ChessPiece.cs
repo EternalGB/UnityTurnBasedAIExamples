@@ -53,6 +53,7 @@ public class ChessPiece
 	static int[][] knightMoves = new int[][]{	new int[]{1,2}, new int[]{-1,2}, new int[]{2,1}, new int[]{2,-1}, 
 												new int[]{1,-2}, new int[]{-1,-2}, new int[]{-2,1}, new int[]{-2,-1}};
 
+	//TODO get proper pawn moments with capturing
 	public List<ChessTurn> GetPawnMoves(ChessBoard board, int posX, int posY)
 	{
 		List<ChessTurn> moves = new List<ChessTurn>();
@@ -140,12 +141,14 @@ public class ChessPiece
 
 	bool OpposingPieceAt(ChessBoard board, int posX, int posY)
 	{
-		return board.board[posX,posY].HasPiece() && board.board[posX,posY].piece.color != color;
+		return posX >= 0 && posX < board.size && posY >= 0 && posY < board.size && 
+			board.board[posX,posY].HasPiece() && board.board[posX,posY].piece.color != color;
 	}
 
 	bool AlliedPieceAt(ChessBoard board, int posX, int posY)
 	{
-		return board.board[posX,posY].HasPiece() && board.board[posX,posY].piece.color == color;
+		return posX >= 0 && posX < board.size && posY >= 0 && posY < board.size && 
+			board.board[posX,posY].HasPiece() && board.board[posX,posY].piece.color == color;
 	}
 	
 	

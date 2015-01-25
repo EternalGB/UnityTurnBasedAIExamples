@@ -50,8 +50,7 @@ public class ChessEvaluator : Evaluator
 					numToAdd = numKings;
 					break;
 				}
-				for(int i = 0; i < numToAdd; i++)
-					pieceCounts[color].Add(type,0);
+				pieceCounts[color].Add(type,numToAdd);
 			}
 		}
 		this.playerColor = playerColor;

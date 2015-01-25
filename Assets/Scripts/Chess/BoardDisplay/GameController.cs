@@ -16,17 +16,51 @@ public class GameController : MonoBehaviour
 	List<GameObject> lastPieces;
 	ChessBoard gameBoard;
 
+	TurnEngine whiteAI;
+	TurnEngine blackAI;
+	bool whiteTurn = true;
+	bool waiting = false;
+	float waitingTime = 1;
 
 	void Start()
 	{
 		gameBoard = new ChessBoard(PieceColor.White);
 		InitBoard(gameBoard);
 		DrawBoard(gameBoard);
+		whiteAI = new TurnEngine(4,new ChessEvaluator(PieceColor.White));
+		blackAI = new TurnEngine(1,new ChessEvaluatorRandom(0,200));
 	}
+
+	void Update()
+	{
+		if(!gameBoard.IsTerminal()) {
+			if(!waiting) {
+				PlayTurn();
+			}
+		} else {
+
+		}
+	}
+
+	void PlayTurn()
+	{
+		Turn nextTurn;
+		if(whiteTurn) 
+			nextTurn = whiteAI.GetNextTurn(gameBoard);
+		else
+			nextTurn = blackAI.GetNextTurn(gameBoard);
+		whiteTurn = !whiteTurn;
+		Debug.Log(nextTurn.ToString());
+		gameBoard = (ChessBoard)nextTurn.ApplyTurn(gameBoard);
+		DrawBoard(gameBoard);
+		StartCoroutine(Timers.Countdown(waitingTime,() => waiting = false));
+
+	}
+
+
 
 	void InitBoard(ChessBoard board)
 	{
-		Color nextColor = black;
 		for(int x = 0; x < board.size; x++) {
 			for(int y = 0; y < board.size; y++) {
 				GameObject square = (GameObject)Instantiate(boardSquare,GetRealPosition(x,y),Quaternion.identity);

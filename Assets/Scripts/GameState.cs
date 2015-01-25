@@ -8,5 +8,7 @@ public abstract class GameState
 	
 	public abstract List<Turn> GeneratePossibleTurns();
 
+	public abstract GameState Clone();
+
 }
 

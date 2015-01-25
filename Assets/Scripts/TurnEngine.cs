@@ -15,7 +15,7 @@ public class TurnEngine
 	public Turn GetNextTurn(GameState state) 
 	{
 		Turn bestTurn = null;
-		Minimax(state,maxDepth,true,ref bestTurn);
+		Minimax(state.Clone(),maxDepth,true,ref bestTurn);
 		return bestTurn;
 	}
 
@@ -28,7 +28,7 @@ public class TurnEngine
 			float bestValue = eval.minValue;
 			List<Turn> turns = state.GeneratePossibleTurns();
 			foreach(Turn turn in turns) {
-				GameState nextState = turn.ApplyTurn(state);
+				GameState nextState = turn.ApplyTurn(state.Clone());
 				float value = Minimax(nextState,depth-1,false, ref bestTurn);
 				if(value > bestValue) {
 					bestValue = value;
@@ -40,7 +40,7 @@ public class TurnEngine
 			float worstValue = eval.maxValue;
 			List<Turn> turns = state.GeneratePossibleTurns();
 			foreach(Turn turn in turns) {
-				GameState nextState = turn.ApplyTurn(state);
+				GameState nextState = turn.ApplyTurn(state.Clone());
 				float value = Minimax(nextState,depth-1,true, ref bestTurn);
 				if(value < worstValue) {
 					worstValue = value;

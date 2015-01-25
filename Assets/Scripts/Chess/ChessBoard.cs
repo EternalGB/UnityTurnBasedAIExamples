@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 
 public class ChessBoard : GameState
@@ -13,6 +12,18 @@ public class ChessBoard : GameState
 		board = new BoardPosition[size,size];
 		this.playerColor = playerColor;
 		InitPieces();
+	}
+
+	public ChessBoard(ChessBoard oldBoard)
+	{
+		board = new BoardPosition[size,size];
+		playerColor = oldBoard.playerColor;
+		size = oldBoard.size;
+		for(int x = 0; x < size; x++) {
+			for(int y = 0; y < size; y++) {
+				board[x,y] = oldBoard.board[x,y];
+			}
+		}
 	}
 
 	void InitPieces()
@@ -64,9 +75,14 @@ public class ChessBoard : GameState
 
 	public override bool IsTerminal ()
 	{
-		ChessPiece whiteKing = new ChessPiece(PieceType.King, PieceColor.White, false);
-		ChessPiece blackKing = new ChessPiece(PieceType.King, PieceColor.Black, false);
-		return !ContainsPiece(whiteKing) || !ContainsPiece(blackKing);
+		ChessPiece whiteKing = new ChessPiece(PieceType.King, PieceColor.White, true);
+		ChessPiece blackKing = new ChessPiece(PieceType.King, PieceColor.Black, true);
+		return ContainsPiece(whiteKing) || ContainsPiece(blackKing);
+	}
+
+	public override GameState Clone ()
+	{
+		return new ChessBoard(this);
 	}
 
 	bool ContainsPiece(ChessPiece piece)

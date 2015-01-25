@@ -53,8 +53,8 @@ public class GameController : MonoBehaviour
 		Debug.Log(nextTurn.ToString());
 		gameBoard = (ChessBoard)nextTurn.ApplyTurn(gameBoard);
 		DrawBoard(gameBoard);
+		waiting = true;
 		StartCoroutine(Timers.Countdown(waitingTime,() => waiting = false));
-
 	}
 
 

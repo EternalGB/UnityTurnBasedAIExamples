@@ -52,26 +52,28 @@ public class ChessPiece
 	static int[][] bishopDirs = new int[][]{new int[]{1,1}, new int[]{-1,1}, new int[]{1,-1}, new int[]{-1,-1}};
 	static int[][] knightMoves = new int[][]{	new int[]{1,2}, new int[]{-1,2}, new int[]{2,1}, new int[]{2,-1}, 
 												new int[]{1,-2}, new int[]{-1,-2}, new int[]{-2,1}, new int[]{-2,-1}};
-
-	//TODO get proper pawn moments with capturing
+	static int[][] pawnCaptures = new int[][]{ new int[]{1,1}, new int[]{-1,1}};
+	
 	public List<ChessTurn> GetPawnMoves(ChessBoard board, int posX, int posY)
 	{
 		List<ChessTurn> moves = new List<ChessTurn>();
 		int dir = 1;
-		List<int> amounts = new List<int>();
-		amounts.Add(1);
 		if(color != PieceColor.White)
 			dir = -1;
-		if(!firstMoveDone)
-			amounts.Add(2);
-
-		foreach(int amount in amounts) {
-			if(posY+amount*dir < board.size) {
-				if(!board.board[posX,posY+amount*dir].HasPiece() || OpposingPieceAt(board,posX,posY+amount*dir)) {
-					moves.Add(new ChessTurn(posX,posY,posX,posY+amount*dir));
+		if(posY+dir >= 0 && posY+dir < board.size) {
+			if(!board.board[posX,posY+dir].HasPiece())
+				moves.Add(new ChessTurn(posX,posY,posX,posY+dir));
+			if(!firstMoveDone && !board.board[posX,posY+dir].HasPiece() && !board.board[posX,posY+dir+dir].HasPiece())
+				moves.Add(new ChessTurn(posX,posY,posX,posY+dir+dir));
+			foreach(int[] cap in pawnCaptures) {
+				if(OpposingPieceAt(board, posX + cap[0], posY + cap[1])) {
+					moves.Add(new ChessTurn(posX,posY,posX + cap[0], posY + cap[1]));
 				}
 			}
 		}
+
+
+
 		return moves;
 	}
 

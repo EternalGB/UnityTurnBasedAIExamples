@@ -8,9 +8,43 @@ public class ChessBoard : GameState
 	public int size = 8;
 	public PieceColor playerColor;
 
-	public ChessBoard()
+	public ChessBoard(PieceColor playerColor)
 	{
 		board = new BoardPosition[size,size];
+		this.playerColor = playerColor;
+		InitPieces();
+	}
+
+	void InitPieces()
+	{
+		for(int x = 0; x < size; x++) {
+			for(int y = 0; y < size; y++) {
+				board[x,y] = new BoardPosition(null);
+			}
+		}
+		//do top and bottom rows
+		int[] topAndBottomRows = new int[]{0,size-1};
+		foreach(int y in topAndBottomRows) {
+			PieceColor color;
+			if(y == 0) {
+				color = PieceColor.White;
+			} else {
+				color = PieceColor.Black;
+			}
+			board[0,y] = new BoardPosition(new ChessPiece(PieceType.Rook,color,false));
+			board[1,y] = new BoardPosition(new ChessPiece(PieceType.Knight,color,false));
+			board[2,y] = new BoardPosition(new ChessPiece(PieceType.Bishop,color,false));
+			board[3,y] = new BoardPosition(new ChessPiece(PieceType.Queen,color,false));
+			board[4,y] = new BoardPosition(new ChessPiece(PieceType.King,color,false));
+			board[5,y] = new BoardPosition(new ChessPiece(PieceType.Bishop,color,false));
+			board[6,y] = new BoardPosition(new ChessPiece(PieceType.Knight,color,false));
+			board[7,y] = new BoardPosition(new ChessPiece(PieceType.Rook,color,false));
+		}
+		for(int x = 0; x < size; x++) {
+			board[x,1] = new BoardPosition(new ChessPiece(PieceType.Pawn,PieceColor.White,false));
+			board[x,size-2] = new BoardPosition(new ChessPiece(PieceType.Pawn,PieceColor.Black,false));
+		}
+
 	}
 
 	public override List<Turn> GeneratePossibleTurns()

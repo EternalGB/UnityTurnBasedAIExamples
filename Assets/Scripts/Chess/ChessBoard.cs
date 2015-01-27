@@ -59,19 +59,17 @@ public class ChessBoard : GameState
 
 	}
 
-	public override List<Turn> GeneratePossibleTurns()
+	public override IEnumerable<Turn> GeneratePossibleTurns()
 	{
-		List<Turn> turns = new List<Turn>();
 		for(int x = 0; x < size; x++) {
 			for(int y = 0; y < size; y++) {
 				if(board[x,y].IsOccupied() && board[x,y].piece.color == playerColor) {
 					List<ChessTurn> chessTurns = board[x,y].piece.GetPossibleMoves(this,x,y);
 					foreach(ChessTurn ct in chessTurns)
-						turns.Add((Turn)ct);
+						yield return (Turn)ct;
 				}
 			}
 		}
-		return turns;
 	}
 
 	public override bool IsTerminal ()

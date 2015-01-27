@@ -1,3 +1,4 @@
+using UnityEngine;
 using System.Collections.Generic;
 using System;
 
@@ -37,6 +38,7 @@ public class ChessEvaluator : Evaluator
 			oppColor = PieceColor.Black;
 		else
 			oppColor = PieceColor.White;
+
 	}
 
 	public override float Evaluate (GameState state)
@@ -56,6 +58,13 @@ public class ChessEvaluator : Evaluator
 				}
 			}
 		}
+		/*
+		foreach(PieceColor color in Enum.GetValues(typeof(PieceColor))) {
+			foreach(PieceType type in Enum.GetValues(typeof(PieceType))) {
+				Debug.Log (Enum.GetName(typeof(PieceColor),color) + " " + Enum.GetName(typeof(PieceType),type) + " count = " + pieceCounts[color][type]);
+			}
+		}
+		*/
 		float value = 0;
 		foreach(PieceType type in Enum.GetValues(typeof(PieceType))) {
 			switch (type) {
@@ -79,6 +88,7 @@ public class ChessEvaluator : Evaluator
 				break;
 			}
 		}
+
 		return value;
 	}
 

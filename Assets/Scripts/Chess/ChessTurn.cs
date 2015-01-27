@@ -21,7 +21,8 @@ public class ChessTurn : Turn
 		ChessPiece piece = board.board[fromX,fromY].piece;
 		board.board[toX,toY] = board.board[fromX,fromY];
 		board.board[fromX,fromY] = new BoardPosition(null);
-		piece.firstMoveDone = true;
+		if(piece != null)
+			piece.firstMoveDone = true;
 		if(board.playerColor == PieceColor.Black)
 			board.playerColor = PieceColor.White;
 		else

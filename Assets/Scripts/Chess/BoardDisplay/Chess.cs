@@ -28,8 +28,8 @@ public class Chess : MonoBehaviour
 		gameBoard = new ChessBoard(PieceColor.White);
 		InitBoard(gameBoard);
 		DrawBoard(gameBoard);
-		whiteAI = new TurnEngine(4,new ChessEvaluator(PieceColor.White));
-		blackAI = new TurnEngine(1,new ChessEvaluatorRandom(0,200));
+		whiteAI = new TurnEngine(5,new ChessEvaluator(PieceColor.White));
+		blackAI = new TurnEngine(1,new ChessEvaluatorRandom(-100,100));
 		whiteAI.TurnReadyEvent += ReceiveTurn;
 		blackAI.TurnReadyEvent += ReceiveTurn;
 	}
@@ -49,10 +49,12 @@ public class Chess : MonoBehaviour
 		//Debug.Log ("Starting Turn");
 		if(whiteTurn) {
 			gameBoard.playerColor = PieceColor.White;
-			StartCoroutine(whiteAI.IterativeMinimax(gameBoard));
+			//StartCoroutine(whiteAI.GetNextTurn(gameBoard));
+			StartCoroutine(whiteAI.GetNextTurn(gameBoard));
 		} else {
 			gameBoard.playerColor = PieceColor.Black;
-			StartCoroutine(blackAI.IterativeMinimax(gameBoard));
+			//StartCoroutine(blackAI.GetNextTurn(gameBoard));
+			StartCoroutine(blackAI.GetNextTurn(gameBoard));
 		}
 		whiteTurn = !whiteTurn;
 		waiting = true;
@@ -69,7 +71,7 @@ public class Chess : MonoBehaviour
 			message += "White moves ";
 		}
 		message += turn.ToString();
-		//Debug.Log(message);
+		Debug.Log(message);
 		//Debug.Log (gameBoard.ToString());
 		gameBoard = (ChessBoard)((ChessTurn)turn).ApplyTurn(gameBoard);
 		//Debug.Log (gameBoard.ToString());

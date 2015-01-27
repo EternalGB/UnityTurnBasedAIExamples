@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 public class CheckersBoard : GameState
 {
 
@@ -56,7 +58,7 @@ public class CheckersBoard : GameState
 		return board[x,y] != Piece.None;
 	}
 
-	public override System.Collections.Generic.List<Turn> GeneratePossibleTurns ()
+	public override IEnumerable<Turn> GeneratePossibleTurns ()
 	{
 		throw new System.NotImplementedException ();
 	}

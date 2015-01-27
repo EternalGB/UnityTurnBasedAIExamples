@@ -105,7 +105,7 @@ public class ChessPiece
 				newY += dir[1];
 				moveCount++;
 			}
-			if(OpposingPieceAt(board,newX,newY)) {
+			if(moveCount < maxDist && OpposingPieceAt(board,newX,newY)) {
 				moves.Add(new ChessTurn(posX,posY,newX,newY));
 			}
 		}

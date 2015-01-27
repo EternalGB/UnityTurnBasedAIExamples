@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 
-public class GameController : MonoBehaviour
+public class Chess : MonoBehaviour
 {
 
 	public List<GameObject> whitePieces;
@@ -20,7 +20,8 @@ public class GameController : MonoBehaviour
 	TurnEngine blackAI;
 	bool whiteTurn = true;
 	bool waiting = false;
-	float waitingTime = 1;
+	bool minWait = false;
+	float minWaitingTime = 2;
 
 	void Start()
 	{
@@ -29,35 +30,52 @@ public class GameController : MonoBehaviour
 		DrawBoard(gameBoard);
 		whiteAI = new TurnEngine(4,new ChessEvaluator(PieceColor.White));
 		blackAI = new TurnEngine(1,new ChessEvaluatorRandom(0,200));
+		whiteAI.TurnReadyEvent += ReceiveTurn;
+		blackAI.TurnReadyEvent += ReceiveTurn;
 	}
 
 	void Update()
 	{
 		if(!gameBoard.IsTerminal()) {
-			if(!waiting) {
+			if(!waiting && !minWait)
 				PlayTurn();
-			}
 		} else {
-
+			Debug.Log ("Game over!");
 		}
 	}
 
 	void PlayTurn()
 	{
-		Turn nextTurn;
-		if(whiteTurn) 
-			nextTurn = whiteAI.GetNextTurn(gameBoard);
-		else
-			nextTurn = blackAI.GetNextTurn(gameBoard);
+		//Debug.Log ("Starting Turn");
+		if(whiteTurn) {
+			gameBoard.playerColor = PieceColor.White;
+			StartCoroutine(whiteAI.IterativeMinimax(gameBoard));
+		} else {
+			gameBoard.playerColor = PieceColor.Black;
+			StartCoroutine(blackAI.IterativeMinimax(gameBoard));
+		}
 		whiteTurn = !whiteTurn;
-		Debug.Log(nextTurn.ToString());
-		gameBoard = (ChessBoard)nextTurn.ApplyTurn(gameBoard);
-		DrawBoard(gameBoard);
 		waiting = true;
-		StartCoroutine(Timers.Countdown(waitingTime,() => waiting = false));
+		minWait = true;
+		StartCoroutine(Timers.Countdown(minWaitingTime,() => minWait = false));
 	}
 
-
+	void ReceiveTurn(Turn turn)
+	{
+		string message = "";
+		if(whiteTurn) {
+			message += "Black moves ";
+		} else {
+			message += "White moves ";
+		}
+		message += turn.ToString();
+		//Debug.Log(message);
+		//Debug.Log (gameBoard.ToString());
+		gameBoard = (ChessBoard)((ChessTurn)turn).ApplyTurn(gameBoard);
+		//Debug.Log (gameBoard.ToString());
+		DrawBoard(gameBoard);
+		waiting = false;
+	}
 
 	void InitBoard(ChessBoard board)
 	{
@@ -90,7 +108,7 @@ public class GameController : MonoBehaviour
 			Destroy(piece);
 		for(int x = 0; x < board.size; x++) {
 			for(int y = 0; y < board.size; y++) {
-				if(board.board[x,y].HasPiece()) {
+				if(board.board[x,y].IsOccupied()) {
 					ChessPiece piece = board.board[x,y].piece;
 					if(piece.color == PieceColor.White)
 						lastPieces.Add((GameObject)Instantiate(whiteDict[piece.type],GetRealPosition(x,y),Quaternion.identity));

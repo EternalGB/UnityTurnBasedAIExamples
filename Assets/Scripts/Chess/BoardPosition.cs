@@ -10,9 +10,16 @@ public class BoardPosition
 		this.piece = piece;
 	}
 
-	public bool HasPiece()
+	public bool IsOccupied()
 	{
 		return piece != null;
 	}
 
+	public BoardPosition Clone()
+	{
+		if(piece != null)
+			return new BoardPosition(piece.Clone());
+		else
+			return new BoardPosition(null);
+	}
 }

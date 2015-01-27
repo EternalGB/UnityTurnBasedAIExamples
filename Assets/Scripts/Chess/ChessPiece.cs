@@ -6,14 +6,12 @@ public class ChessPiece
 
 	public PieceType type;
 	public PieceColor color;
-	public bool captured;
 	public bool firstMoveDone;
 
-	public ChessPiece (PieceType type, PieceColor color, bool captured)
+	public ChessPiece (PieceType type, PieceColor color)
 	{
 		this.type = type;
 		this.color = color;
-		this.captured = captured;
 		firstMoveDone = false;
 	}
 	
@@ -22,10 +20,17 @@ public class ChessPiece
 	{
 		if(obj.GetType().Equals(typeof(ChessPiece))) {
 			ChessPiece other = (ChessPiece)obj;
-			return other.color == color && other.type == type && other.captured == captured;
+			return other.color == color && other.type == type;
 		} else
 			return false;
 
+	}
+
+	public ChessPiece Clone()
+	{
+		ChessPiece piece =  new ChessPiece(type,color);
+		piece.firstMoveDone = firstMoveDone;
+		return piece;
 	}
 
 	public List<ChessTurn> GetPossibleMoves(ChessBoard board, int posX, int posY)
@@ -54,35 +59,32 @@ public class ChessPiece
 												new int[]{1,-2}, new int[]{-1,-2}, new int[]{-2,1}, new int[]{-2,-1}};
 	static int[][] pawnCaptures = new int[][]{ new int[]{1,1}, new int[]{-1,1}};
 	
-	public List<ChessTurn> GetPawnMoves(ChessBoard board, int posX, int posY)
+	List<ChessTurn> GetPawnMoves(ChessBoard board, int posX, int posY)
 	{
 		List<ChessTurn> moves = new List<ChessTurn>();
 		int dir = 1;
 		if(color != PieceColor.White)
 			dir = -1;
 		if(posY+dir >= 0 && posY+dir < board.size) {
-			if(!board.board[posX,posY+dir].HasPiece())
+			if(!board.board[posX,posY+dir].IsOccupied())
 				moves.Add(new ChessTurn(posX,posY,posX,posY+dir));
-			if(!firstMoveDone && !board.board[posX,posY+dir].HasPiece() && !board.board[posX,posY+dir+dir].HasPiece())
+			if(!firstMoveDone && !board.board[posX,posY+dir].IsOccupied() && !board.board[posX,posY+dir+dir].IsOccupied())
 				moves.Add(new ChessTurn(posX,posY,posX,posY+dir+dir));
 			foreach(int[] cap in pawnCaptures) {
-				if(OpposingPieceAt(board, posX + cap[0], posY + cap[1])) {
-					moves.Add(new ChessTurn(posX,posY,posX + cap[0], posY + cap[1]));
+				if(OpposingPieceAt(board, posX + cap[0], posY + dir*cap[1])) {
+					moves.Add(new ChessTurn(posX,posY,posX + cap[0], posY + dir*cap[1]));
 				}
 			}
 		}
-
-
-
 		return moves;
 	}
 
-	public List<ChessTurn> GetRookMoves(ChessBoard board, int posX, int posY)
+	List<ChessTurn> GetRookMoves(ChessBoard board, int posX, int posY)
 	{
 		return GetLinearMoves(board,posX,posY,rookDirs,board.size);
 	}
 
-	public List<ChessTurn> GetBishopMoves(ChessBoard board, int posX, int posY)
+	List<ChessTurn> GetBishopMoves(ChessBoard board, int posX, int posY)
 	{
 		return GetLinearMoves(board,posX,posY,bishopDirs,board.size);
 	}
@@ -97,7 +99,7 @@ public class ChessPiece
 			while(moveCount < maxDist &&
 			      newX >= 0 && newX < board.size &&
 			      newY >= 0 && newY < board.size &&
-			      !board.board[newX,newY].HasPiece()) {
+			      !board.board[newX,newY].IsOccupied()) {
 				moves.Add(new ChessTurn(posX,posY,newX,newY));
 				newX += dir[0];
 				newY += dir[1];
@@ -110,7 +112,7 @@ public class ChessPiece
 		return moves;
 	}
 
-	public List<ChessTurn> GetKnightMoves(ChessBoard board, int posX, int posY)
+	List<ChessTurn> GetKnightMoves(ChessBoard board, int posX, int posY)
 	{
 		List<ChessTurn> moves = new List<ChessTurn>();
 		foreach(int[] move in knightMoves) {
@@ -125,7 +127,7 @@ public class ChessPiece
 		return moves;
 	}
 
-	public List<ChessTurn> GetQueenMoves(ChessBoard board, int posX, int posY)
+	List<ChessTurn> GetQueenMoves(ChessBoard board, int posX, int posY)
 	{
 		List<ChessTurn> turns = new List<ChessTurn>();
 		turns.AddRange(GetRookMoves(board,posX,posY));
@@ -133,7 +135,7 @@ public class ChessPiece
 		return turns;
 	}
 
-	public List<ChessTurn> GetKingMoves(ChessBoard board, int posX, int posY)
+	List<ChessTurn> GetKingMoves(ChessBoard board, int posX, int posY)
 	{
 		List<ChessTurn> turns = new List<ChessTurn>();
 		turns.AddRange(GetLinearMoves(board,posX,posY,rookDirs,1));
@@ -144,13 +146,13 @@ public class ChessPiece
 	bool OpposingPieceAt(ChessBoard board, int posX, int posY)
 	{
 		return posX >= 0 && posX < board.size && posY >= 0 && posY < board.size && 
-			board.board[posX,posY].HasPiece() && board.board[posX,posY].piece.color != color;
+			board.board[posX,posY].IsOccupied() && board.board[posX,posY].piece.color != color;
 	}
 
 	bool AlliedPieceAt(ChessBoard board, int posX, int posY)
 	{
 		return posX >= 0 && posX < board.size && posY >= 0 && posY < board.size && 
-			board.board[posX,posY].HasPiece() && board.board[posX,posY].piece.color == color;
+			board.board[posX,posY].IsOccupied() && board.board[posX,posY].piece.color == color;
 	}
 	
 	

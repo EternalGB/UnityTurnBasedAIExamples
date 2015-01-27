@@ -50,7 +50,7 @@ public class ChessEvaluator : Evaluator
 		}
 		for(int x = 0; x < board.size; x++) {
 			for(int y = 0; y < board.size; y++) {
-				if(board.board[x,y].HasPiece()) {
+				if(board.board[x,y].IsOccupied()) {
 					ChessPiece piece = board.board[x,y].piece;
 					pieceCounts[piece.color][piece.type] += 1;
 				}

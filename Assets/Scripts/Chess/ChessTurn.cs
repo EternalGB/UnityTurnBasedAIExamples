@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 public class ChessTurn : Turn
 {
@@ -17,17 +18,21 @@ public class ChessTurn : Turn
 	public override GameState ApplyTurn (GameState state)
 	{
 		ChessBoard board = (ChessBoard)state;
-		if(board.board[toX,toY].HasPiece()) {
-			board.board[toX,toY].piece.captured = true;
-		}
-		board.board[toX,toY] = board.board[fromX,fromX];
+		ChessPiece piece = board.board[fromX,fromY].piece;
+		board.board[toX,toY] = board.board[fromX,fromY];
 		board.board[fromX,fromY] = new BoardPosition(null);
+		piece.firstMoveDone = true;
+		if(board.playerColor == PieceColor.Black)
+			board.playerColor = PieceColor.White;
+		else
+			board.playerColor = PieceColor.Black;
 		return board;
 	}
 
+
 	public override string ToString ()
 	{
-		return "Moving piece from (" + fromX + "," + fromY + ")" + " to " + "(" + toX + "," + toY + ")";
+		return "(" + fromX + "," + fromY + ")" + " to " + "(" + toX + "," + toY + ")";
 	}
 
 

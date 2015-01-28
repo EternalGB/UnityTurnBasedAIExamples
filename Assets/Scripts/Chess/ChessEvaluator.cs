@@ -30,7 +30,8 @@ public class ChessEvaluator : Evaluator
 		pieceCounts.Add(PieceColor.White, new Dictionary<PieceType, int>());
 		foreach(PieceColor color in Enum.GetValues(typeof(PieceColor))) {
 			foreach(PieceType type in Enum.GetValues(typeof(PieceType))) {
-				pieceCounts[color].Add(type,0);
+				if(type != PieceType.None)
+					pieceCounts[color].Add(type,0);
 			}
 		}
 		this.playerColor = playerColor;
@@ -47,13 +48,14 @@ public class ChessEvaluator : Evaluator
 		ChessBoard board = (ChessBoard)state;
 		foreach(PieceColor color in Enum.GetValues(typeof(PieceColor))) {
 			foreach(PieceType type in Enum.GetValues(typeof(PieceType))) {
-				pieceCounts[color][type] = 0;
+				if(type != PieceType.None)
+					pieceCounts[color][type] = 0;
 			}
 		}
 		for(int x = 0; x < board.size; x++) {
 			for(int y = 0; y < board.size; y++) {
-				if(board.board[x,y].IsOccupied()) {
-					ChessPiece piece = board.board[x,y].piece;
+				if(board.IsOccupied(x,y)) {
+					ChessPiece piece = board.board[x,y];
 					pieceCounts[piece.color][piece.type] += 1;
 				}
 			}
@@ -85,6 +87,8 @@ public class ChessEvaluator : Evaluator
 				break;
 			case PieceType.King:
 				value += kingWeight*(pieceCounts[playerColor][type] - pieceCounts[oppColor][type]);
+				break;
+			default:
 				break;
 			}
 		}

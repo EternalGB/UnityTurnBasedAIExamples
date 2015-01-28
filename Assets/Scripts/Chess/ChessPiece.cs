@@ -14,7 +14,16 @@ public class ChessPiece
 		this.color = color;
 		firstMoveDone = false;
 	}
-	
+
+	static ChessPiece empty = new ChessPiece(PieceType.None,PieceColor.White);
+
+	public static ChessPiece Empty
+	{
+		get
+		{
+			return empty;
+		}
+	}
 
 	public override bool Equals (object obj)
 	{
@@ -24,6 +33,15 @@ public class ChessPiece
 		} else
 			return false;
 
+	}
+
+	public override int GetHashCode ()
+	{
+		int hash = 17;
+		hash = hash*23 + type.GetHashCode();
+		hash = hash*23 + color.GetHashCode();
+		hash = hash*23 + firstMoveDone.GetHashCode();
+		return hash;
 	}
 
 	public ChessPiece Clone()
@@ -66,9 +84,9 @@ public class ChessPiece
 		if(color != PieceColor.White)
 			dir = -1;
 		if(posY+dir >= 0 && posY+dir < board.size) {
-			if(!board.board[posX,posY+dir].IsOccupied())
+			if(!board.IsOccupied(posX,posY+dir))
 				moves.Add(new ChessTurn(posX,posY,posX,posY+dir));
-			if(!firstMoveDone && !board.board[posX,posY+dir].IsOccupied() && !board.board[posX,posY+dir+dir].IsOccupied())
+			if(!firstMoveDone && !board.IsOccupied(posX,posY+dir) && !board.IsOccupied(posX,posY+dir+dir))
 				moves.Add(new ChessTurn(posX,posY,posX,posY+dir+dir));
 			foreach(int[] cap in pawnCaptures) {
 				if(OpposingPieceAt(board, posX + cap[0], posY + dir*cap[1])) {
@@ -99,7 +117,7 @@ public class ChessPiece
 			while(moveCount < maxDist &&
 			      newX >= 0 && newX < board.size &&
 			      newY >= 0 && newY < board.size &&
-			      !board.board[newX,newY].IsOccupied()) {
+			      !board.IsOccupied(newX,newY)) {
 				moves.Add(new ChessTurn(posX,posY,newX,newY));
 				newX += dir[0];
 				newY += dir[1];
@@ -146,13 +164,13 @@ public class ChessPiece
 	bool OpposingPieceAt(ChessBoard board, int posX, int posY)
 	{
 		return posX >= 0 && posX < board.size && posY >= 0 && posY < board.size && 
-			board.board[posX,posY].IsOccupied() && board.board[posX,posY].piece.color != color;
+			board.IsOccupied(posX,posY) && board.board[posX,posY].color != color;
 	}
 
 	bool AlliedPieceAt(ChessBoard board, int posX, int posY)
 	{
 		return posX >= 0 && posX < board.size && posY >= 0 && posY < board.size && 
-			board.board[posX,posY].IsOccupied() && board.board[posX,posY].piece.color == color;
+			board.IsOccupied(posX,posY) && board.board[posX,posY].color == color;
 	}
 	
 	

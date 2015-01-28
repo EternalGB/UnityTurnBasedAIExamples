@@ -3,26 +3,29 @@ using System.Collections.Generic;
 public class ChessBoard : GameState
 {
 
-	public BoardPosition[,] board;
+	public ChessPiece[,] board;
 	public int size = 8;
 	public PieceColor playerColor;
 
 
 	public ChessBoard(PieceColor playerColor)
 	{
-		board = new BoardPosition[size,size];
+		board = new ChessPiece[size,size];
 		this.playerColor = playerColor;
 		InitPieces();
 	}
 
 	public ChessBoard(ChessBoard oldBoard)
 	{
-		board = new BoardPosition[size,size];
+		board = new ChessPiece[size,size];
 		playerColor = oldBoard.playerColor;
 		size = oldBoard.size;
 		for(int x = 0; x < size; x++) {
 			for(int y = 0; y < size; y++) {
-				board[x,y] = oldBoard.board[x,y].Clone();
+				if(oldBoard.IsOccupied(x,y))
+					board[x,y] = oldBoard.board[x,y].Clone();
+				else
+					board[x,y] = oldBoard.board[x,y];
 			}
 		}
 	}
@@ -31,7 +34,7 @@ public class ChessBoard : GameState
 	{
 		for(int x = 0; x < size; x++) {
 			for(int y = 0; y < size; y++) {
-				board[x,y] = new BoardPosition(null);
+				board[x,y] = ChessPiece.Empty;
 			}
 		}
 		//do top and bottom rows
@@ -43,18 +46,18 @@ public class ChessBoard : GameState
 			} else {
 				color = PieceColor.Black;
 			}
-			board[0,y] = new BoardPosition(new ChessPiece(PieceType.Rook,color));
-			board[1,y] = new BoardPosition(new ChessPiece(PieceType.Knight,color));
-			board[2,y] = new BoardPosition(new ChessPiece(PieceType.Bishop,color));
-			board[3,y] = new BoardPosition(new ChessPiece(PieceType.Queen,color));
-			board[4,y] = new BoardPosition(new ChessPiece(PieceType.King,color));
-			board[5,y] = new BoardPosition(new ChessPiece(PieceType.Bishop,color));
-			board[6,y] = new BoardPosition(new ChessPiece(PieceType.Knight,color));
-			board[7,y] = new BoardPosition(new ChessPiece(PieceType.Rook,color));
+			board[0,y] = new ChessPiece(PieceType.Rook,color);
+			board[1,y] = new ChessPiece(PieceType.Knight,color);
+			board[2,y] = new ChessPiece(PieceType.Bishop,color);
+			board[3,y] = new ChessPiece(PieceType.Queen,color);
+			board[4,y] = new ChessPiece(PieceType.King,color);
+			board[5,y] = new ChessPiece(PieceType.Bishop,color);
+			board[6,y] = new ChessPiece(PieceType.Knight,color);
+			board[7,y] = new ChessPiece(PieceType.Rook,color);
 		}
 		for(int x = 0; x < size; x++) {
-			board[x,1] = new BoardPosition(new ChessPiece(PieceType.Pawn,PieceColor.White));
-			board[x,size-2] = new BoardPosition(new ChessPiece(PieceType.Pawn,PieceColor.Black));
+			board[x,1] = new ChessPiece(PieceType.Pawn,PieceColor.White);
+			board[x,size-2] = new ChessPiece(PieceType.Pawn,PieceColor.Black);
 		}
 
 	}
@@ -63,8 +66,8 @@ public class ChessBoard : GameState
 	{
 		for(int x = 0; x < size; x++) {
 			for(int y = 0; y < size; y++) {
-				if(board[x,y].IsOccupied() && board[x,y].piece.color == playerColor) {
-					List<ChessTurn> chessTurns = board[x,y].piece.GetPossibleMoves(this,x,y);
+				if(IsOccupied(x,y) && board[x,y].color == playerColor) {
+					List<ChessTurn> chessTurns = board[x,y].GetPossibleMoves(this,x,y);
 					foreach(ChessTurn ct in chessTurns)
 						yield return (Turn)ct;
 				}
@@ -96,11 +99,16 @@ public class ChessBoard : GameState
 		return new ChessBoard(this);
 	}
 
+	public bool IsOccupied(int x, int y)
+	{
+		return board[x,y].type != PieceType.None;
+	}
+
 	bool ContainsPiece(ChessPiece piece)
 	{
 		for(int x = 0; x < size; x++) {
 			for(int y = 0; y < size; y++) {
-				if(board[x,y].IsOccupied() && piece.Equals(board[x,y].piece))
+				if(IsOccupied(x,y) && piece.Equals(board[x,y]))
 					return true;
 			}
 		}
@@ -111,7 +119,7 @@ public class ChessBoard : GameState
 	{
 		for(int x = 0; x < size; x++) {
 			for(int y = 0; y < size; y++) {
-				ChessPiece next = board[x,y].piece;
+				ChessPiece next = board[x,y];
 				if(next != null && next.type == piece.type && next.color == piece.color) {
 					return new int[]{x,y};
 				}
@@ -125,8 +133,8 @@ public class ChessBoard : GameState
 		string message = "";
 		for(int y = size-1; y >= 0; y--) {
 			for(int x = 0; x < size; x++) {
-				if(board[x,y].IsOccupied()) {
-					ChessPiece next = board[x,y].piece;
+				if(IsOccupied(x,y)) {
+					ChessPiece next = board[x,y];
 					message += "<b>";
 					if(next.color == PieceColor.Black)
 						message += "<i>";
@@ -164,6 +172,21 @@ public class ChessBoard : GameState
 			message += "\n";
 		}
 		return message;
+	}
+
+	static int fieldPrime = 23;
+
+	public override int GetHashCode ()
+	{
+		int hash = 17;
+
+		for(int x = 0; x < size; x++) {
+			for(int y = 0; y < size; y++) {
+				hash = hash*fieldPrime + board[x,y].GetHashCode();
+			}
+		}
+		hash = hash*fieldPrime + playerColor.GetHashCode();
+		return hash;
 	}
 
 }

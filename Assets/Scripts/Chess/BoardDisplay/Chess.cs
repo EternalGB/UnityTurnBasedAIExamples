@@ -28,8 +28,8 @@ public class Chess : MonoBehaviour
 		gameBoard = new ChessBoard(PieceColor.White);
 		InitBoard(gameBoard);
 		DrawBoard(gameBoard);
-		whiteAI = new TurnEngine(5,new ChessEvaluator(PieceColor.White));
-		blackAI = new TurnEngine(1,new ChessEvaluatorRandom(-100,100));
+		whiteAI = new TurnEngine(new ChessEvaluator(PieceColor.White),5,true);
+		blackAI = new TurnEngine(new ChessEvaluatorRandom(-100,100),1);
 		whiteAI.TurnReadyEvent += ReceiveTurn;
 		blackAI.TurnReadyEvent += ReceiveTurn;
 	}
@@ -110,8 +110,8 @@ public class Chess : MonoBehaviour
 			Destroy(piece);
 		for(int x = 0; x < board.size; x++) {
 			for(int y = 0; y < board.size; y++) {
-				if(board.board[x,y].IsOccupied()) {
-					ChessPiece piece = board.board[x,y].piece;
+				if(board.IsOccupied(x,y)) {
+					ChessPiece piece = board.board[x,y];
 					if(piece.color == PieceColor.White)
 						lastPieces.Add((GameObject)Instantiate(whiteDict[piece.type],GetRealPosition(x,y),Quaternion.identity));
 					else

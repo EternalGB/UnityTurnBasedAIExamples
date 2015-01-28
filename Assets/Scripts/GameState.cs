@@ -10,5 +10,7 @@ public abstract class GameState
 
 	public abstract GameState Clone();
 
+	//public abstract override int GetHashCode ();
+
 }
 

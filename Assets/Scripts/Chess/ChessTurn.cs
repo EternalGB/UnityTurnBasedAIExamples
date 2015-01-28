@@ -18,9 +18,9 @@ public class ChessTurn : Turn
 	public override GameState ApplyTurn (GameState state)
 	{
 		ChessBoard board = (ChessBoard)state;
-		ChessPiece piece = board.board[fromX,fromY].piece;
+		ChessPiece piece = board.board[fromX,fromY];
 		board.board[toX,toY] = board.board[fromX,fromY];
-		board.board[fromX,fromY] = new BoardPosition(null);
+		board.board[fromX,fromY] = ChessPiece.Empty;
 		if(piece != null)
 			piece.firstMoveDone = true;
 		if(board.playerColor == PieceColor.Black)

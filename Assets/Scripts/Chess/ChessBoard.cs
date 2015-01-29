@@ -6,11 +6,13 @@ public class ChessBoard : GameState
 	public ChessPiece[,] board;
 	public int size = 8;
 	public PieceColor playerColor;
-
+	//holds the position of any current enPassant pawn (can only ever be two max)
+	public List<int[]> enPassant;
 
 	public ChessBoard(PieceColor playerColor)
 	{
 		board = new ChessPiece[size,size];
+		enPassant = null;
 		this.playerColor = playerColor;
 		InitPieces();
 	}
@@ -20,6 +22,10 @@ public class ChessBoard : GameState
 		board = new ChessPiece[size,size];
 		playerColor = oldBoard.playerColor;
 		size = oldBoard.size;
+		if(oldBoard.enPassant != null)
+			enPassant = new List<int[]>(oldBoard.enPassant);
+		else
+			enPassant = null;
 		for(int x = 0; x < size; x++) {
 			for(int y = 0; y < size; y++) {
 				if(oldBoard.IsOccupied(x,y))

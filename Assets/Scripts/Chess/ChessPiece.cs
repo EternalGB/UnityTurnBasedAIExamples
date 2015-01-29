@@ -94,6 +94,21 @@ public class ChessPiece
 				}
 			}
 		}
+
+		//check for en passant
+		if(board.enPassant != null) {
+			foreach(int[] enPassant in board.enPassant) {
+				if(enPassant[0] == posX && enPassant[1] == posY) {
+					int left = posX-1;
+					int right = posX+1;
+					board.enPassant = new List<int[]>();
+					if(left >= 0 && left < board.size && board.IsOccupied(left,posY) && board.board[left,posY].type == PieceType.Pawn)
+						moves.Add(new ChessTurn(posX,posY,left,posY+dir));
+					if(right >= 0 && right < board.size && board.IsOccupied(right,posY) && board.board[right,posY].type == PieceType.Pawn)
+						moves.Add(new ChessTurn(posX,posY,right,posY+dir));
+				}
+			}
+		}
 		return moves;
 	}
 
@@ -136,9 +151,7 @@ public class ChessPiece
 		foreach(int[] move in knightMoves) {
 			int newX = posX+move[0];
 			int newY = posY+move[1];
-			if(newX >= 0 && newX < board.size &&
-			   newY >= 0 && newY < board.size &&
-			   !AlliedPieceAt(board,posX,posY)) {
+			if(!AlliedPieceAt(board,posX,posY)) {
 				moves.Add(new ChessTurn(posX,posY,newX,newY));
 			}
 		}

@@ -16,12 +16,6 @@ public class ChessEvaluator : Evaluator
 	knightWeight = 3,
 	pawnWeight = 1;
 
-	const int numPawns = 8, 
-	numBishops = 2,
-	numRooks = 2,
-	numKnights = 2,
-	numQueens = 1,
-	numKings = 1;
 
 	public ChessEvaluator(PieceColor playerColor)
 	{

@@ -105,9 +105,14 @@ public class ChessBoard : GameState
 		return new ChessBoard(this);
 	}
 
+	public bool OnBoard(int x, int y)
+	{
+		return x >= 0 && x < size && y >= 0 && y < size;
+	}
+
 	public bool IsOccupied(int x, int y)
 	{
-		return board[x,y].type != PieceType.None;
+		return OnBoard(x,y) && board[x,y].type != PieceType.None;
 	}
 
 	bool ContainsPiece(ChessPiece piece)

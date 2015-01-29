@@ -130,8 +130,7 @@ public class ChessPiece
 			int newY = posY+dir[1];
 			int moveCount = 0;
 			while(moveCount < maxDist &&
-			      newX >= 0 && newX < board.size &&
-			      newY >= 0 && newY < board.size &&
+			      board.OnBoard(newX,newY) && 
 			      !board.IsOccupied(newX,newY)) {
 				moves.Add(new ChessTurn(posX,posY,newX,newY));
 				newX += dir[0];
@@ -151,10 +150,13 @@ public class ChessPiece
 		foreach(int[] move in knightMoves) {
 			int newX = posX+move[0];
 			int newY = posY+move[1];
-			if(!AlliedPieceAt(board,posX,posY)) {
-				moves.Add(new ChessTurn(posX,posY,newX,newY));
+			if(board.OnBoard(newX,newY) && !AlliedPieceAt(board,newX,newY)) {
+				ChessTurn turn = new ChessTurn(posX,posY,newX,newY);
+				moves.Add(turn);
+				//UnityEngine.Debug.Log ("Made knight move " + turn);
 			}
 		}
+
 		return moves;
 	}
 
@@ -174,17 +176,18 @@ public class ChessPiece
 		return turns;
 	}
 
+
+
 	bool OpposingPieceAt(ChessBoard board, int posX, int posY)
 	{
-		return posX >= 0 && posX < board.size && posY >= 0 && posY < board.size && 
-			board.IsOccupied(posX,posY) && board.board[posX,posY].color != color;
+		return board.IsOccupied(posX,posY) && board.board[posX,posY].color != color;
 	}
 
 	bool AlliedPieceAt(ChessBoard board, int posX, int posY)
 	{
-		return posX >= 0 && posX < board.size && posY >= 0 && posY < board.size && 
-			board.IsOccupied(posX,posY) && board.board[posX,posY].color == color;
+		return board.IsOccupied(posX,posY) && board.board[posX,posY].color == color;
 	}
+
 	
 	
 }

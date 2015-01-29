@@ -29,7 +29,7 @@ public class Chess : MonoBehaviour
 		InitBoard(gameBoard);
 		DrawBoard(gameBoard);
 		whiteAI = new TurnEngine(new ChessEvaluator(PieceColor.White),5,true);
-		blackAI = new TurnEngine(new ChessEvaluatorRandom(-100,100),1);
+		blackAI = new TurnEngine(new ChessEvaluator(PieceColor.Black),3,true);
 		whiteAI.TurnReadyEvent += ReceiveTurn;
 		blackAI.TurnReadyEvent += ReceiveTurn;
 	}

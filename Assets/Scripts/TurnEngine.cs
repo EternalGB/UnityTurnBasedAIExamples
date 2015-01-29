@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 
-public class TurnEngine 
+public class TurnEngine
 {
 
 	int maxDepth;

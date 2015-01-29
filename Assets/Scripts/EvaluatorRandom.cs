@@ -1,12 +1,12 @@
 using System;
 
-public class ChessEvaluatorRandom : Evaluator
+public class EvaluatorRandom : Evaluator
 {
 
 	float min, max;
 	Random rando;
 
-	public ChessEvaluatorRandom(float min, float max)
+	public EvaluatorRandom(float min, float max)
 	{
 		this.min = min;
 		this.max = max;

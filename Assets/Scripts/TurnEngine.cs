@@ -19,7 +19,7 @@ public class TurnEngine
 	public event TurnReady TurnReadyEvent;
 	
 
-	public TurnEngine(Evaluator eval, int limit, bool timeLimited = false)
+	public TurnEngine(Evaluator eval, int limit, bool timeLimited)
 	{
 		this.timeLimited = timeLimited;
 		if(timeLimited) {

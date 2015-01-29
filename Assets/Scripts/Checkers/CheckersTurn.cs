@@ -4,6 +4,7 @@ public class CheckersTurn : Turn
 {
 
 	int fromX, fromY, toX, toY;
+	int[][] captureLocations;
 
 	public CheckersTurn (int fromX, int fromY, int toX, int toY)
 	{
@@ -17,6 +18,7 @@ public class CheckersTurn : Turn
 	{
 		CheckersBoard board = (CheckersBoard)state.Clone();
 		board.MovePiece(fromX,fromY,toX,toY);
+
 		return board;
 	}
 	

@@ -9,11 +9,17 @@ public class ChessBoard : GameState
 	//holds the position of any current enPassant pawn (can only ever be two max)
 	public List<int[]> enPassant;
 
+	//50 move rule, a 'move' counts as both players taking a turn
+	const int moveLimit = 100;
+	public int moveCount;
+
+
 	public ChessBoard(PieceColor playerColor)
 	{
 		board = new ChessPiece[size,size];
 		enPassant = null;
 		this.playerColor = playerColor;
+		moveCount = 0;
 		InitPieces();
 	}
 
@@ -26,6 +32,7 @@ public class ChessBoard : GameState
 			enPassant = new List<int[]>(oldBoard.enPassant);
 		else
 			enPassant = null;
+		moveCount = oldBoard.moveCount;
 		for(int x = 0; x < size; x++) {
 			for(int y = 0; y < size; y++) {
 				if(oldBoard.IsOccupied(x,y))
@@ -34,6 +41,7 @@ public class ChessBoard : GameState
 					board[x,y] = oldBoard.board[x,y];
 			}
 		}
+
 	}
 
 	void InitPieces()
@@ -86,18 +94,11 @@ public class ChessBoard : GameState
 		//bad first one: terminal when king captured
 		ChessPiece whiteKing = new ChessPiece(PieceType.King, PieceColor.White);
 		ChessPiece blackKing = new ChessPiece(PieceType.King, PieceColor.Black);
-		return !ContainsPiece(whiteKing) || !ContainsPiece(blackKing);
+		return moveCount >= moveLimit || !ContainsPiece(whiteKing) || !ContainsPiece(blackKing);
 
 		//TODO check detection
 
-		/*
-		ChessPiece whiteKing = new ChessPiece(PieceType.King, PieceColor.White, false);
-		ChessPiece blackKing = new ChessPiece(PieceType.King, PieceColor.Black, false);
-		int[] whiteLoc = FindPieceLocationOnBoard(whiteKing);
-		int[] blackLoc = FindPieceLocationOnBoard(blackKing);
-		return whiteKing.GetPossibleMoves(this,whiteLoc[0],whiteLoc[1]).Count == 0 || blackKing.GetPossibleMoves(this,blackLoc[0],blackLoc[1]).Count == 0;
-		*/
-		//TODO stalemates
+
 	}
 
 	public override GameState Clone ()

@@ -25,13 +25,15 @@ public class Chess : MonoBehaviour
 
 	void Start()
 	{
-		gameBoard = new ChessBoard(PieceColor.White);
-		InitBoard(gameBoard);
-		DrawBoard(gameBoard);
-		whiteAI = new TurnEngine(new ChessEvaluator(PieceColor.White),5,true);
-		blackAI = new TurnEngine(new ChessEvaluator(PieceColor.Black),1,true);
+		whiteAI = new TurnEngine(new ChessEvaluator(PieceColor.White),5,true,true);
+		blackAI = new TurnEngine(new ChessEvaluator(PieceColor.Black),1,true,true);
 		whiteAI.TurnReadyEvent += ReceiveTurn;
 		blackAI.TurnReadyEvent += ReceiveTurn;
+
+		gameBoard = new ChessBoard(PieceColor.White);
+		InitBoardDisplay(gameBoard);
+		DrawBoard(gameBoard);
+		PlayTurn();
 	}
 
 	void Update()
@@ -48,11 +50,11 @@ public class Chess : MonoBehaviour
 	{
 		//Debug.Log ("Starting Turn");
 		if(whiteTurn) {
-			gameBoard.playerColor = PieceColor.White;
+			//gameBoard.playerColor = PieceColor.White;
 			//StartCoroutine(whiteAI.GetNextTurn(gameBoard));
 			StartCoroutine(whiteAI.GetNextTurn(gameBoard));
 		} else {
-			gameBoard.playerColor = PieceColor.Black;
+			//gameBoard.playerColor = PieceColor.Black;
 			//StartCoroutine(blackAI.GetNextTurn(gameBoard));
 			StartCoroutine(blackAI.GetNextTurn(gameBoard));
 		}
@@ -79,7 +81,7 @@ public class Chess : MonoBehaviour
 		waiting = false;
 	}
 
-	void InitBoard(ChessBoard board)
+	void InitBoardDisplay(ChessBoard board)
 	{
 		for(int x = 0; x < board.size; x++) {
 			for(int y = 0; y < board.size; y++) {

@@ -19,9 +19,12 @@ public class ChessTurn : Turn
 	public override GameState ApplyTurn (GameState state)
 	{
 		ChessBoard board = (ChessBoard)state;
+		bool captureOccured = !board.board[toX,toY].Equals(ChessPiece.Empty);
+
 		board.board[toX,toY] = board.board[fromX,fromY];
 		board.board[fromX,fromY] = ChessPiece.Empty;
 		ChessPiece piece = board.board[toX,toY];
+
 
 		//check for existing enPassant
 		if(board.enPassant != null) {
@@ -38,11 +41,13 @@ public class ChessTurn : Turn
 
 		}
 
+		bool pawnMoved = false;
 		board.enPassant = null;
 		if(piece != null) {
 			piece.firstMoveDone = true;
 
 			if(piece.type == PieceType.Pawn) {
+				pawnMoved = true;
 				//if there is a pawn at the bottom or top of the board, promote to queen
 				if(toY == 0 || toY == board.size-1) 
 					piece.type = PieceType.Queen;
@@ -65,6 +70,12 @@ public class ChessTurn : Turn
 			board.playerColor = PieceColor.White;
 		else
 			board.playerColor = PieceColor.Black;
+
+		if(captureOccured || pawnMoved)
+			board.moveCount = 0;
+		else
+			board.moveCount++;
+
 		return board;
 	}
 

@@ -14,6 +14,7 @@ public class Chess : MonoBehaviour
 	public Color black, white;
 	public Vector2 bottomLeft;
 	public float squareSize;
+	public GameObject restartButton;
 	List<GameObject> lastPieces;
 	ChessBoard gameBoard;
 
@@ -47,7 +48,7 @@ public class Chess : MonoBehaviour
 			if(!waiting && !minWait)
 				PlayTurn();
 		} else {
-			Debug.Log ("Game over!");
+			restartButton.SetActive(true);
 		}
 	}
 
@@ -80,7 +81,13 @@ public class Chess : MonoBehaviour
 		waiting = false;
 	}
 
-
+	public void Restart()
+	{
+		gameBoard = new ChessBoard(PieceColor.White);
+		DrawBoard(gameBoard);
+		PlayTurn();
+		restartButton.SetActive(false);
+	}
 
 	void InitBoardDisplay(ChessBoard board)
 	{

@@ -22,12 +22,16 @@ public class Chess : MonoBehaviour
 	bool whiteTurn = true;
 	bool waiting = false;
 	bool minWait = false;
-	float minWaitingTime = 2;
+	public float minWaitingTime = 2;
+	[Range(1,15)]
+	public int whiteThinkingTime = 10;
+	[Range(1,15)]
+	public int blackThinkingTime = 10;
 
 	void Start()
 	{
-		whiteAI = new TurnEngine(new ChessEvaluator(PieceColor.White),5,true,true);
-		blackAI = new TurnEngine(new ChessEvaluator(PieceColor.Black),1,true,true);
+		whiteAI = new TurnEngine(new ChessEvaluator(PieceColor.White),whiteThinkingTime,true,true);
+		blackAI = new TurnEngine(new ChessEvaluator(PieceColor.Black),blackThinkingTime,true,true);
 		whiteAI.TurnReadyEvent += ReceiveTurn;
 		blackAI.TurnReadyEvent += ReceiveTurn;
 
@@ -49,14 +53,9 @@ public class Chess : MonoBehaviour
 
 	void PlayTurn()
 	{
-		//Debug.Log ("Starting Turn");
 		if(whiteTurn) {
-			//gameBoard.playerColor = PieceColor.White;
-			//StartCoroutine(whiteAI.GetNextTurn(gameBoard));
 			StartCoroutine(whiteAI.GetNextTurn(gameBoard));
 		} else {
-			//gameBoard.playerColor = PieceColor.Black;
-			//StartCoroutine(blackAI.GetNextTurn(gameBoard));
 			StartCoroutine(blackAI.GetNextTurn(gameBoard));
 		}
 		whiteTurn = !whiteTurn;
@@ -75,12 +74,13 @@ public class Chess : MonoBehaviour
 		}
 		message += turn.ToString();
 		Debug.Log(message);
-		//Debug.Log (gameBoard.ToString());
+
 		gameBoard = (ChessBoard)((ChessTurn)turn).ApplyTurn(gameBoard);
-		//Debug.Log (gameBoard.ToString());
 		DrawBoard(gameBoard);
 		waiting = false;
 	}
+
+
 
 	void InitBoardDisplay(ChessBoard board)
 	{
@@ -137,6 +137,8 @@ public class Chess : MonoBehaviour
 				return piece;
 		return null;
 	}
+
+
 
 }
 

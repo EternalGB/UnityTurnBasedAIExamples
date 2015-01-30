@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using GenericTurnBasedAI;
 
 public class ChessTurn : Turn
 {

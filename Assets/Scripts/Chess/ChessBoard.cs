@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GenericTurnBasedAI;
 
 public class ChessBoard : GameState
 {

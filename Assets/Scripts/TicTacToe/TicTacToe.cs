@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using GenericTurnBasedAI;
 
 public class TicTacToe : MonoBehaviour
 {
@@ -16,13 +17,13 @@ public class TicTacToe : MonoBehaviour
 	bool XTurn = true;
 	bool waiting = false;
 	bool minWait = false;
-	float minWaitingTime = 2;
+	public float minWaitingTime = 2;
 
 	void Start()
 	{
-		gameBoard = new TTTBoard(TTTBoard.TTTPiece.X);
-
 		lastPieces = new List<GameObject>();
+		Restart();
+
 		bottomLeft = -((gameBoard.Size- gridSize)/2)*Vector2.one;
 
 
@@ -30,16 +31,20 @@ public class TicTacToe : MonoBehaviour
 		OAI = new TurnEngine(new TTTEvaluator(TTTBoard.TTTPiece.O),10,false,true);
 		XAI.TurnReadyEvent += ReceiveTurn;
 		OAI.TurnReadyEvent += ReceiveTurn;
+
+
 	}
 
 	void Update()
 	{
+
 		if(!gameBoard.IsTerminal()) {
 			if(!waiting && !minWait)
 				PlayTurn();
 		} else {
-			Debug.Log ("Game over!");
+			Restart();
 		}
+
 	}
 
 	void PlayTurn()
@@ -79,6 +84,13 @@ public class TicTacToe : MonoBehaviour
 		}
 	}
 
-
+	void Restart()
+	{
+		gameBoard = new TTTBoard(TTTBoard.TTTPiece.X);
+		XTurn = true;
+		waiting = false;
+		minWait = false;
+		DrawBoard();
+	}
 }
 

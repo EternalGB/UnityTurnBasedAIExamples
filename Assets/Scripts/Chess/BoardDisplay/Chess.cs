@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using GenericTurnBasedAI;
 
 public class Chess : MonoBehaviour
 {

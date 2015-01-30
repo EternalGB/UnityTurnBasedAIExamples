@@ -1,4 +1,5 @@
 using System.Collections;
+using GenericTurnBasedAI;
 
 public class CheckersTurn : Turn
 {

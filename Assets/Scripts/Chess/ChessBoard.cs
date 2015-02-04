@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using GenericTurnBasedAI;
+using UnityEngine;
 
-public class ChessBoard : GameState
+public class ChessBoard : HashableGameState
 {
 
 	public ChessPiece[,] board;
@@ -84,7 +85,7 @@ public class ChessBoard : GameState
 				if(IsOccupied(x,y) && board[x,y].color == playerColor) {
 					List<ChessTurn> chessTurns = board[x,y].GetPossibleMoves(this,x,y);
 					foreach(ChessTurn ct in chessTurns)
-						yield return (Turn)ct;
+						yield return ct;
 				}
 			}
 		}
@@ -201,5 +202,6 @@ public class ChessBoard : GameState
 		hash = hash*fieldPrime + playerColor.GetHashCode();
 		return hash;
 	}
+
 
 }

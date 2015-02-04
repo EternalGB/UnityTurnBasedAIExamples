@@ -21,4 +21,9 @@ public class TTTEvaluator : Evaluator
 			return 0;
 	}
 
+	public override Evaluator Clone()
+	{
+		return new TTTEvaluator(player);
+	}
+
 }

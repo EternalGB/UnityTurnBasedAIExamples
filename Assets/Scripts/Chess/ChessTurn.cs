@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using GenericTurnBasedAI;
 
-public class ChessTurn : Turn
+public class ChessTurn : HashableTurn
 {
 
 	int fromX,fromY,toX,toY;
@@ -84,6 +84,16 @@ public class ChessTurn : Turn
 	public override string ToString ()
 	{
 		return "(" + fromX + "," + fromY + ")" + " to " + "(" + toX + "," + toY + ")";
+	}
+
+	public override int GetHashCode ()
+	{
+		int hash = 17;
+		hash = hash*23 + fromX;
+		hash = hash*23 + fromY;
+		hash = hash*23 + toX;
+		hash = hash*23 + toY;
+		return hash;
 	}
 
 

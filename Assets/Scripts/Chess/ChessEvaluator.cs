@@ -6,16 +6,17 @@ using GenericTurnBasedAI;
 public class ChessEvaluator : Evaluator
 {
 
-	PieceColor playerColor;
-	PieceColor oppColor;
-	Dictionary<PieceColor, Dictionary<PieceType, int>> pieceCounts;
+	public PieceColor playerColor;
+	public PieceColor oppColor;
+	public Dictionary<PieceColor, Dictionary<PieceType, int>> pieceCounts;
 
 	const float kingWeight = 200,
 	queenWeight = 9,
 	rookWeight = 5,
 	bishopWeight = 3,
 	knightWeight = 3,
-	pawnWeight = 1;
+	pawnWeight = 1,
+	mobilityWeight = 0.1f;
 
 
 	public ChessEvaluator(PieceColor playerColor)
@@ -37,6 +38,13 @@ public class ChessEvaluator : Evaluator
 
 	}
 
+	public ChessEvaluator(ChessEvaluator oldEval)
+	{
+		playerColor = oldEval.playerColor;
+		oppColor = oldEval.oppColor;
+		pieceCounts = new Dictionary<PieceColor, Dictionary<PieceType, int>>(oldEval.pieceCounts);
+	}
+
 	public override float Evaluate (GameState state)
 	{
 
@@ -47,11 +55,17 @@ public class ChessEvaluator : Evaluator
 					pieceCounts[color][type] = 0;
 			}
 		}
+		float playerMobility = 0;
+		float oppMobility = 0;
 		for(int x = 0; x < board.size; x++) {
 			for(int y = 0; y < board.size; y++) {
 				if(board.IsOccupied(x,y)) {
 					ChessPiece piece = board.board[x,y];
 					pieceCounts[piece.color][piece.type] += 1;
+					if(piece.color == playerColor)
+						playerMobility += piece.GetPossibleMoves(board,x,y).Count;
+					else
+						oppMobility += piece.GetPossibleMoves(board,x,y).Count;
 				}
 			}
 		}
@@ -80,8 +94,13 @@ public class ChessEvaluator : Evaluator
 				break;
 			}
 		}
-
+		value += mobilityWeight*(playerMobility - oppMobility);
 		return value;
+	}
+
+	public override Evaluator Clone()
+	{
+		return new ChessEvaluator(this);
 	}
 
 }

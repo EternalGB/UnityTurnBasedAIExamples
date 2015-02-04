@@ -14,8 +14,8 @@ public class StatCollector : MonoBehaviour
 
 	void Start()
 	{
-		whiteAI = new TurnEngine(new ChessEvaluator(PieceColor.White),1,true,true);
-		blackAI = new TurnEngine(new ChessEvaluator(PieceColor.Black),1,true,true);
+		whiteAI = new TurnEngineSingleThreaded(new ChessEvaluator(PieceColor.White),1,true,true);
+		blackAI = new TurnEngineSingleThreaded(new ChessEvaluator(PieceColor.Black),1,true,true);
 		whiteAI.TurnReadyEvent += ReceiveTurn;
 		blackAI.TurnReadyEvent += ReceiveTurn;
 

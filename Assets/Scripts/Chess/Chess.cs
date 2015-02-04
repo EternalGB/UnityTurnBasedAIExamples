@@ -24,6 +24,7 @@ public class Chess : MonoBehaviour
 	bool waiting = false;
 	bool minWait = false;
 	public float minWaitingTime = 2;
+
 	[Range(1,15)]
 	public int whiteThinkingTime = 10;
 	[Range(1,15)]
@@ -31,8 +32,9 @@ public class Chess : MonoBehaviour
 
 	void Start()
 	{
-		whiteAI = new TurnEngine(new ChessEvaluator(PieceColor.White),whiteThinkingTime,true,true);
-		blackAI = new TurnEngine(new ChessEvaluator(PieceColor.Black),blackThinkingTime,true,true);
+
+		whiteAI = new TurnEngineSingleThreaded(new ChessEvaluator(PieceColor.White),whiteThinkingTime,true, true);
+		blackAI = new TurnEngineMultiThreaded(new ChessEvaluator(PieceColor.Black),blackThinkingTime,true,4,4,true);
 		whiteAI.TurnReadyEvent += ReceiveTurn;
 		blackAI.TurnReadyEvent += ReceiveTurn;
 
@@ -59,26 +61,42 @@ public class Chess : MonoBehaviour
 		} else {
 			StartCoroutine(blackAI.GetNextTurn(gameBoard));
 		}
-		whiteTurn = !whiteTurn;
+
 		waiting = true;
 		minWait = true;
-		StartCoroutine(Timers.Countdown(minWaitingTime,() => minWait = false));
+		Invoke("CancelMinWait",minWaitingTime);
 	}
 
 	void ReceiveTurn(Turn turn)
 	{
+		string statMessage = "";
+		if(whiteTurn) {
+			statMessage += "White Stats: ";
+			statMessage += whiteAI.Stats.ToString();
+		} else {
+			statMessage += "Black Stats: ";
+			statMessage += blackAI.Stats.ToString();
+		}
+		Debug.Log (statMessage);
+
 		string message = "";
 		if(whiteTurn) {
-			message += "Black moves ";
-		} else {
 			message += "White moves ";
+		} else {
+			message += "Black moves ";
 		}
 		message += turn.ToString();
 		Debug.Log(message);
 
 		gameBoard = (ChessBoard)((ChessTurn)turn).ApplyTurn(gameBoard);
+		whiteTurn = !whiteTurn;
 		DrawBoard(gameBoard);
 		waiting = false;
+	}
+
+	void CancelMinWait()
+	{
+		minWait = false;
 	}
 
 	public void Restart()
@@ -87,6 +105,14 @@ public class Chess : MonoBehaviour
 		DrawBoard(gameBoard);
 		PlayTurn();
 		restartButton.SetActive(false);
+	}
+
+	void OnDisable()
+	{
+		if(whiteAI != null)
+			whiteAI.Stop();
+		if(blackAI != null)
+			blackAI.Stop();
 	}
 
 	void InitBoardDisplay(ChessBoard board)

@@ -27,8 +27,8 @@ public class TicTacToe : MonoBehaviour
 		bottomLeft = -((gameBoard.Size- gridSize)/2)*Vector2.one;
 
 
-		XAI = new TurnEngine(new TTTEvaluator(TTTBoard.TTTPiece.X),10,false,true);
-		OAI = new TurnEngine(new TTTEvaluator(TTTBoard.TTTPiece.O),10,false,true);
+		XAI = new TurnEngineMultiThreaded(new TTTEvaluator(TTTBoard.TTTPiece.X),10, false, false);
+		OAI = new TurnEngineSingleThreaded(new TTTEvaluator(TTTBoard.TTTPiece.O),10, false, false);
 		XAI.TurnReadyEvent += ReceiveTurn;
 		OAI.TurnReadyEvent += ReceiveTurn;
 
@@ -55,16 +55,17 @@ public class TicTacToe : MonoBehaviour
 		} else {
 			StartCoroutine(OAI.GetNextTurn(gameBoard));
 		}
-		XTurn = !XTurn;
 		waiting = true;
 		minWait = true;
-		StartCoroutine(Timers.Countdown(minWaitingTime,() => minWait = false));
+		Invoke("CancelMinWait",minWaitingTime);
 	}
 
 	void ReceiveTurn(Turn turn)
 	{
+
 		//Debug.Log (gameBoard.ToString());
 		gameBoard = (TTTBoard)((TTTTurn)turn).ApplyTurn(gameBoard);
+		XTurn = !XTurn;
 		//Debug.Log (gameBoard.ToString());
 		DrawBoard();
 		waiting = false;
@@ -84,12 +85,18 @@ public class TicTacToe : MonoBehaviour
 		}
 	}
 
+	void CancelMinWait()
+	{
+		minWait = false;
+	}
+
 	void Restart()
 	{
 		gameBoard = new TTTBoard(TTTBoard.TTTPiece.X);
 		XTurn = true;
 		waiting = false;
 		minWait = false;
+		CancelInvoke("CancelMinWait");
 		DrawBoard();
 	}
 }

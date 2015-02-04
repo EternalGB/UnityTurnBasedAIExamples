@@ -6,7 +6,7 @@ using GenericTurnBasedAI;
 public class ChessTurn : HashableTurn
 {
 
-	int fromX,fromY,toX,toY;
+	public int fromX,fromY,toX,toY;
 
 	public ChessTurn (int fromX, int fromY, int toX, int toY)
 	{

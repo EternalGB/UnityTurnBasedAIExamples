@@ -11,7 +11,8 @@ public class Chess : MonoBehaviour
 	Dictionary<PieceType,GameObject> whiteDict;
 	Dictionary<PieceType,GameObject> blackDict;
 	public GameObject boardSquare;
-	public Color black, white;
+	GameObject[,] squares;
+	public Color black, white, red, green;
 	public Vector2 bottomLeft;
 	public float squareSize;
 	public GameObject restartButton;
@@ -49,7 +50,7 @@ public class Chess : MonoBehaviour
 
 		gameBoard = new ChessBoard(PieceColor.White);
 		InitBoardDisplay(gameBoard);
-		DrawBoard(gameBoard);
+		DrawBoard(gameBoard, null);
 		PlayTurn();
 	}
 
@@ -97,9 +98,9 @@ public class Chess : MonoBehaviour
 		message += turn.ToString();
 		Debug.Log(message);
 
-		gameBoard = (ChessBoard)((ChessTurn)turn).ApplyTurn(gameBoard);
+		gameBoard = (ChessBoard)(turn as ChessTurn).ApplyTurn(gameBoard);
 		//whiteTurn = !whiteTurn;
-		DrawBoard(gameBoard);
+		DrawBoard(gameBoard, turn as ChessTurn);
 		waiting = false;
 	}
 
@@ -112,7 +113,7 @@ public class Chess : MonoBehaviour
 	{
 		//whiteTurn = true;
 		gameBoard = new ChessBoard(PieceColor.White);
-		DrawBoard(gameBoard);
+		DrawBoard(gameBoard, null);
 		PlayTurn();
 		restartButton.SetActive(false);
 	}
@@ -127,18 +128,13 @@ public class Chess : MonoBehaviour
 
 	void InitBoardDisplay(ChessBoard board)
 	{
+		squares = new GameObject[board.size,board.size];
 		for(int x = 0; x < board.size; x++) {
 			for(int y = 0; y < board.size; y++) {
 				GameObject square = (GameObject)Instantiate(boardSquare,GetRealPosition(x,y),Quaternion.identity);
-				SpriteRenderer sr = square.GetComponent<SpriteRenderer>();
-				if(x%2 == 0 && y%2 == 0)
-					sr.color = black;
-				if(x%2 == 0 && y%2 != 0)
-					sr.color = white;
-				if(x%2 != 0 && y%2 == 0)
-					sr.color = white;
-				if(x%2 != 0 && y%2 != 0)
-					sr.color = black;
+				square.GetComponent<SpriteRenderer>().color = GetSquareColor(x,y);
+
+				squares[x,y] = square;
 			}
 		}
 		whiteDict = new Dictionary<PieceType, GameObject>();
@@ -150,12 +146,13 @@ public class Chess : MonoBehaviour
 		lastPieces = new List<GameObject>();
 	}
 
-	void DrawBoard(ChessBoard board)
+	void DrawBoard(ChessBoard board, ChessTurn lastTurn)
 	{
 		foreach(GameObject piece in lastPieces)
 			Destroy(piece);
 		for(int x = 0; x < board.size; x++) {
 			for(int y = 0; y < board.size; y++) {
+				squares[x,y].GetComponent<SpriteRenderer>().color = GetSquareColor(x,y);
 				if(board.IsOccupied(x,y)) {
 					ChessPiece piece = board.board[x,y];
 					if(piece.color == PieceColor.White)
@@ -163,13 +160,31 @@ public class Chess : MonoBehaviour
 					else
 						lastPieces.Add((GameObject)Instantiate(blackDict[piece.type],GetRealPosition(x,y),Quaternion.identity));
 				}
+
 			}
+		}
+		if(lastTurn != null) {
+			squares[lastTurn.fromX, lastTurn.fromY].GetComponent<SpriteRenderer>().color = red;
+			squares[lastTurn.toX, lastTurn.toY].GetComponent<SpriteRenderer>().color = green;
 		}
 	}
 
 	Vector2 GetRealPosition(int x, int y)
 	{
 		return bottomLeft + new Vector2(x*squareSize,y*squareSize);
+	}
+
+	Color GetSquareColor(int x, int y)
+	{
+		if(x%2 == 0 && y%2 == 0)
+			return black;
+		if(x%2 == 0 && y%2 != 0)
+			return white;
+		if(x%2 != 0 && y%2 == 0)
+			return white;
+		if(x%2 != 0 && y%2 != 0)
+			return black;
+		return Color.white;
 	}
 
 	GameObject FindPiece(List<GameObject> pieces, PieceType type)

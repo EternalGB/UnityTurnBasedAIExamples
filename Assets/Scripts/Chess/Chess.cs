@@ -43,8 +43,8 @@ public class Chess : MonoBehaviour
 	void Start()
 	{
 
-		whiteAI = new TurnEngineSingleThreaded(new ChessEvaluator(PieceColor.White),whiteThinkingTime,true, true);
-		blackAI = new TurnEngineMultiThreaded(new ChessEvaluator(PieceColor.Black),blackThinkingTime,true,4,4,true);
+		whiteAI = new TurnEngineSingleThreaded(new ChessEvaluator(PieceColor.White),whiteThinkingTime,true,true);
+		blackAI = new TurnEngineSingleThreaded(new EvaluatorRandom(-100,100), 1,false,true);
 		whiteAI.TurnReadyEvent += ReceiveTurn;
 		blackAI.TurnReadyEvent += ReceiveTurn;
 
@@ -112,6 +112,7 @@ public class Chess : MonoBehaviour
 	public void Restart()
 	{
 		//whiteTurn = true;
+		CancelInvoke("CancelMinWait");
 		gameBoard = new ChessBoard(PieceColor.White);
 		DrawBoard(gameBoard, null);
 		PlayTurn();

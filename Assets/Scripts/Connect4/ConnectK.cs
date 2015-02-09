@@ -43,7 +43,11 @@ public class ConnectK : MonoBehaviour
 	void ReceiveTurn(Turn turn)
 	{
 		board = turn.ApplyTurn(board) as ConnectKBoard;
-		PlayTurn();
+		DrawBoard();
+		if(board.IsTerminal())
+			Debug.Log ("Game over");
+		else
+			PlayTurn();
 	}
 
 	void InitBoard()
@@ -65,13 +69,11 @@ public class ConnectK : MonoBehaviour
 		lastPieces.Clear();
 		for(int x = 0; x < board.nCols; x++) {
 			for(int y = 0; y < board.nRows; y++) {
-				GameObject piece;
 				if(board.GetPiece(x,y) == ConnectKPiece.P1) {
-					piece = (GameObject)Instantiate(p1Piece, GetRealPosition(x,y), Quaternion.identity);
-				} else {
-					piece = (GameObject)Instantiate(p2Piece, GetRealPosition(x,y), Quaternion.identity);
+					lastPieces.Add((GameObject)Instantiate(p1Piece, GetRealPosition(x,y), Quaternion.identity));
+				} else if(board.GetPiece(x,y) == ConnectKPiece.P2){
+					lastPieces.Add((GameObject)Instantiate(p2Piece, GetRealPosition(x,y), Quaternion.identity));
 				}
-				lastPieces.Add(piece);
 			}
 		}
 	}

@@ -51,6 +51,7 @@ public class ConnectKHumanPlayer : TurnAgent
 
 	public override void GenerateNextTurn(GameState state)
 	{
+		Debug.Log (name + " generating turn");
 		ConnectKBoard board = state as ConnectKBoard;
 		buttonCanvas.gameObject.SetActive(true);
 		for(int i = 0; i < buttons.Count; i++) {

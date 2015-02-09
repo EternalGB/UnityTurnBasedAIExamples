@@ -63,6 +63,16 @@ public class ConnectKBoard : GameState
 	//clone constructor
 	public ConnectKBoard(ConnectKBoard oldBoard)
 	{
+		board = new ConnectKPiece[oldBoard.nCols, oldBoard.nRows];
+		for(int x = 0; x < nCols; x++) {
+			for(int y = 0; y < nRows; y++) {
+				board[x,y] = oldBoard.board[x,y];
+			}
+		}
+
+		player = oldBoard.player;
+		k = oldBoard.k;
+
 		p1Count = new Dictionary<Line, float>();
 		p2Count = new Dictionary<Line, float>();
 		dirty = new Dictionary<Line, bool>();
@@ -171,8 +181,10 @@ public class ConnectKBoard : GameState
 
 		int actualY = nRows-1;
 		for(int y = 0; y < nRows; y++) {
-			if(board[column,y] != ConnectKPiece.None)
+			if(board[column,y] == ConnectKPiece.None) {
 				actualY = y;
+				break;
+			}
 		}
 		IntVector2 pos = new IntVector2(column,actualY);
 		board[pos.x,pos.y] = piece;

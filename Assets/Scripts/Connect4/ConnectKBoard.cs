@@ -20,9 +20,8 @@ public class ConnectKBoard : GameState
 	public ConnectKPiece player;
 
 	//none of these need to be cloned
-	static List<Line> allLines;
-	static bool linesInitiated = false;
-	static Dictionary<IntVector2, List<Line>> lineDict; 
+	protected List<Line> allLines;
+	protected Dictionary<IntVector2, List<Line>> lineDict; 
 
 	//hold the number of pieces in each row, column and diagonal for p1 and p2 respectively
 	public Dictionary<Line, float> p1Count;
@@ -31,6 +30,7 @@ public class ConnectKBoard : GameState
 	//a start is dirty if its p1 or p2 count is above k needs to be checked for matches
 	//prevents us from checking every start with count above k that will never have any matches (is full)
 	public Dictionary<Line, bool> dirty;
+	
 
 	public ConnectKBoard(int numColumns, int numRows, int numMatches)
 	{
@@ -49,8 +49,7 @@ public class ConnectKBoard : GameState
 		p2Count = new Dictionary<Line, float>();
 
 		dirty = new Dictionary<Line, bool>();
-		if(!linesInitiated)
-			InitLines();
+		InitLines();
 
 		foreach(Line line in allLines) {
 			p1Count.Add(line,0);
@@ -73,6 +72,9 @@ public class ConnectKBoard : GameState
 		player = oldBoard.player;
 		k = oldBoard.k;
 
+		allLines = oldBoard.allLines;
+		lineDict = oldBoard.lineDict;
+
 		p1Count = new Dictionary<Line, float>();
 		p2Count = new Dictionary<Line, float>();
 		dirty = new Dictionary<Line, bool>();
@@ -83,14 +85,9 @@ public class ConnectKBoard : GameState
 		}
 	}
 
-	//precompute a bunch of stuff
 	void InitLines()
 	{
-		allLines = new List<Line>();
-		allLines.AddRange(GetAscendingDiagonals());
-		allLines.AddRange(GetDescendingDiagonals());
-		allLines.AddRange(GetRows());
-		allLines.AddRange(GetCols());
+		allLines = GetLines(nCols,nRows,k);
 		lineDict = new Dictionary<IntVector2, List<Line>>();
 		for(int x = 0; x < nCols; x++) {
 			for(int y = 0; y < nRows; y++) {
@@ -110,12 +107,22 @@ public class ConnectKBoard : GameState
 				lineDict[pos].Add(new Line(new IntVector2(x,0), new IntVector2(0,1)));
 			}
 		}
-		linesInitiated = true;
+	}
+
+	//precompute a bunch of stuff
+	public static List<Line> GetLines(int nCols, int nRows, int k)
+	{
+		List<Line> allLines = new List<Line>();
+		allLines.AddRange(GetAscendingDiagonals(nCols, nRows, k));
+		allLines.AddRange(GetDescendingDiagonals(nCols, nRows, k));
+		allLines.AddRange(GetRows(nCols, nRows));
+		allLines.AddRange(GetCols(nCols, nRows));
+		return allLines;
 	}
 
 
 
-	List<Line> GetAscendingDiagonals()
+	static List<Line> GetAscendingDiagonals(int nCols, int nRows, int k)
 	{
 		List<Line> diags = new List<Line>();
 		for(int x = 0; x <= nCols - k; x++)
@@ -125,7 +132,7 @@ public class ConnectKBoard : GameState
 		return diags;
 	}
 	
-	List<Line> GetDescendingDiagonals()
+	static List<Line> GetDescendingDiagonals(int nCols, int nRows, int k)
 	{
 		List<Line> diags = new List<Line>();
 		for(int x = 0; x <= nCols - k; x++)
@@ -135,7 +142,7 @@ public class ConnectKBoard : GameState
 		return diags;
 	}
 	
-	List<Line> GetRows()
+	static List<Line> GetRows(int nCols, int nRows)
 	{
 		List<Line> rows = new List<Line>();
 		for(int y = 0; y < nRows; y++)
@@ -143,7 +150,7 @@ public class ConnectKBoard : GameState
 		return rows;
 	}
 	
-	List<Line> GetCols()
+	static List<Line> GetCols(int nCols, int nRows)
 	{
 		List<Line> cols = new List<Line>();
 		for(int x = 0; x < nCols; x++)
@@ -171,7 +178,7 @@ public class ConnectKBoard : GameState
 		return board[col,nRows-1] != ConnectKPiece.None;
 	}
 
-	public static List<Line> GetLines(IntVector2 pos)
+	List<Line> GetLines(IntVector2 pos)
 	{
 		return lineDict[pos];
 	}
@@ -260,35 +267,36 @@ public class ConnectKBoard : GameState
 		return new ConnectKBoard(this);
 	}
 
-	public class Line
+}
+
+public class Line
+{
+	public IntVector2 start;
+	public IntVector2 dir;
+	
+	public Line (IntVector2 start, IntVector2 dir)
 	{
-		public IntVector2 start;
-		public IntVector2 dir;
-
-		public Line (IntVector2 start, IntVector2 dir)
-		{
-			this.start = start;
-			this.dir = dir;
-		}
-
-		public override bool Equals (object obj)
-		{
-			Line other = obj as Line;
-			if(other == null)
-				return false;
-
-			return start.Equals(other.start) && dir.Equals(other.dir);
-		}
-
-		public override int GetHashCode ()
-		{
-			int hash = 17;
-			hash = hash*23 + start.GetHashCode();
-			hash = hash*23 + dir.GetHashCode();
-			return hash;
-		}
+		this.start = start;
+		this.dir = dir;
 	}
-
+	
+	public override bool Equals (object obj)
+	{
+		Line other = obj as Line;
+		if(other == null)
+			return false;
+		
+		return start.Equals(other.start) && dir.Equals(other.dir);
+	}
+	
+	public override int GetHashCode ()
+	{
+		int hash = 17;
+		hash = hash*23 + start.GetHashCode();
+		hash = hash*23 + dir.GetHashCode();
+		return hash;
+	}
+	
 }
 
 public class IntVector2

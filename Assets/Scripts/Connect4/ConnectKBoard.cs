@@ -15,7 +15,7 @@ public class ConnectKBoard : GameState
 	{
 		get{return board.GetLength(0);}
 	}
-	int k;
+	public int k;
 
 	public ConnectKPiece player;
 
@@ -236,12 +236,22 @@ public class ConnectKBoard : GameState
 				piece = board[x,y];
 				count = 1;
 			}
-			if(count == k)
+			if(count >= k)
 				return true;
 			x += xDir;
 			y += yDir;
 		}
-		return count == k;
+		return count >= k;
+	}
+
+	public bool IsEmpty(int x, int y)
+	{
+		return IsValidSpace(x,y) && GetPiece(x,y) == ConnectKPiece.None;
+	}
+
+	public bool IsValidSpace(int x, int y)
+	{
+		return x >= 0 && x < nCols && y >= 0 && y < nRows;
 	}
 
 	public ConnectKPiece GetPiece(int x, int y)

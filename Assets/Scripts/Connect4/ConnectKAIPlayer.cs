@@ -6,6 +6,7 @@ public class ConnectKAIPlayer : TurnAgent
 {
 
 	public ConnectKPiece player;
+	public bool multiThreaded = false;
 	[Range(1,15)]
 	public int timeLimit;
 	TurnEngine engine;
@@ -14,7 +15,10 @@ public class ConnectKAIPlayer : TurnAgent
 	{
 		ConnectKBoard board = state as ConnectKBoard;
 		int depthLimit = board.nRows*board.nCols;
-		engine = new TurnEngineMultiThreaded(new ConnectKEvaluator(player,board.nCols,board.nRows,board.k),timeLimit,depthLimit,true);
+		if(multiThreaded)
+			engine = new TurnEngineMultiThreaded(new ConnectKEvaluator(player,board.nCols,board.nRows,board.k),timeLimit,depthLimit,true);
+		else
+			engine = new TurnEngineSingleThreaded(new ConnectKEvaluator(player,board.nCols,board.nRows,board.k),timeLimit,depthLimit,true);
 		engine.TurnReadyEvent += HandleTurnReadyEvent;
 	}
 

@@ -254,6 +254,15 @@ public class ConnectKBoard : GameState
 		return x >= 0 && x < nCols && y >= 0 && y < nRows;
 	}
 
+	public bool IsBoardFull()
+	{
+		bool result = true;
+		for(int x = 0; x < nCols; x++) {
+			result = result && !IsEmpty(x,nRows-1);
+		}
+		return result;
+	}
+
 	public ConnectKPiece GetPiece(int x, int y)
 	{
 		return board[x,y];
@@ -261,7 +270,7 @@ public class ConnectKBoard : GameState
 
 	public override bool IsTerminal ()
 	{
-		return CheckMatches();
+		return CheckMatches() || IsBoardFull();
 	}
 
 	public override System.Collections.Generic.IEnumerable<Turn> GeneratePossibleTurns ()

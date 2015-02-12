@@ -1,4 +1,4 @@
-using GenericTurnBasedAI;
+using UniversalTurnBasedAI;
 using UnityEngine;
 using System.Collections.Generic;
 using System;

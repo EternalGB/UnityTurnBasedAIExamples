@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-using GenericTurnBasedAI;
+using UniversalTurnBasedAI;
 using System;
 
 public class ConnectKEvaluator : Evaluator

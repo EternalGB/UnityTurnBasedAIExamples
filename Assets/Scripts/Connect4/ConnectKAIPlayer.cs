@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections;
-using GenericTurnBasedAI;
+using UniversalTurnBasedAI;
 
 public class ConnectKAIPlayer : TurnAgent
 {

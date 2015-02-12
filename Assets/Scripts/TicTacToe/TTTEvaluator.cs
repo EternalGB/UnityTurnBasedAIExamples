@@ -1,4 +1,4 @@
-using GenericTurnBasedAI;
+using UniversalTurnBasedAI;
 
 public class TTTEvaluator : Evaluator
 {

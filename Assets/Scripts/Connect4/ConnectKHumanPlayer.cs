@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-using GenericTurnBasedAI;
+using UniversalTurnBasedAI;
 using UnityEngine.UI;
 
 public class ConnectKHumanPlayer : TurnAgent

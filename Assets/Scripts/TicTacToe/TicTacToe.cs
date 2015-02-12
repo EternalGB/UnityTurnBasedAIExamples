@@ -27,8 +27,8 @@ public class TicTacToe : MonoBehaviour
 		bottomLeft = -((gameBoard.Size- gridSize)/2)*Vector2.one;
 
 
-		XAI = new TurnEngineMultiThreaded(new TTTEvaluator(TTTBoard.TTTPiece.X),10, false, false);
-		OAI = new TurnEngineSingleThreaded(new TTTEvaluator(TTTBoard.TTTPiece.O),10, false, false);
+		XAI = new TurnEngineMultiThreaded(new TTTEvaluator(TTTBoard.TTTPiece.X),10, false);
+		OAI = new TurnEngineSingleThreaded(new TTTEvaluator(TTTBoard.TTTPiece.O),10, false);
 		XAI.TurnReadyEvent += ReceiveTurn;
 		OAI.TurnReadyEvent += ReceiveTurn;
 

@@ -10,7 +10,7 @@ public class ConnectKAIPlayer : TurnAgent
 
 	public ConnectKPiece player;
 	public bool multiThreaded = false;
-	[Range(1,15)]
+	[Range(0.1f,15)]
 	public float timeLimit;
 	TurnEngine engine;
 

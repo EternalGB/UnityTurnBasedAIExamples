@@ -1,5 +1,8 @@
 using UniversalTurnBasedAI;
 
+/// <summary>
+/// Internal representation of our Tic Tac Toe board
+/// </summary>
 public class TTTBoard : GameState
 {
 

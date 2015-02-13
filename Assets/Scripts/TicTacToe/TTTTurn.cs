@@ -1,5 +1,8 @@
 using UniversalTurnBasedAI;
 
+/// <summary>
+/// A Tic Tac Toe turn
+/// </summary>
 public class TTTTurn : Turn
 {
 

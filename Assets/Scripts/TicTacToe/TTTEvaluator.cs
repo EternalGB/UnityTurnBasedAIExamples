@@ -1,5 +1,9 @@
 using UniversalTurnBasedAI;
 
+/// <summary>
+/// Tic Tac Toe evaluator. We don't bother evaluating partial states as we are just
+/// going to search the whole tree every time anyway
+/// </summary>
 public class TTTEvaluator : Evaluator
 {
 

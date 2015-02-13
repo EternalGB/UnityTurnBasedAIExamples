@@ -2,6 +2,9 @@ using UnityEngine;
 using System.Collections.Generic;
 using UniversalTurnBasedAI;
 
+/// <summary>
+/// Game controller for Tic Tac Toe.
+/// </summary>
 public class TicTacToe : MonoBehaviour
 {
 

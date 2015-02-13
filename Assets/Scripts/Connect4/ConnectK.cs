@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using UniversalTurnBasedAI;
 
+/// <summary>
+/// Game controller for Connect K - a generalisation of Connect 4 where
+/// board width and height and number in a row (k) can be defined. This
+/// is just the Unity wrapper that handles all the GameObjects and coordinates
+/// the playing of turns.
+/// </summary>
 public class ConnectK : MonoBehaviour 
 {
 	public GameObject gridSquare;
@@ -19,20 +25,25 @@ public class ConnectK : MonoBehaviour
 
 	void Start()
 	{
+		//create our internal board representation
 		board = new ConnectKBoard(width,height,matches);
 		InitBoard();
 		lastPieces = new List<GameObject>();
 
+		//initialise our turn agents
 		p1.Init(board);
 		p2.Init(board);
 
+		//register to receive and process turns
 		p1.TurnReadyEvent += ReceiveTurn;
 		p2.TurnReadyEvent += ReceiveTurn;
+		//start the turn loop
 		PlayTurn();
 	}
 
 	void PlayTurn()
 	{
+		//Generate the next player's turn
 		if(board.player == ConnectKPiece.P1) {
 			p1.GenerateNextTurn(board);
 		} else {
@@ -42,8 +53,10 @@ public class ConnectK : MonoBehaviour
 
 	void ReceiveTurn(Turn turn)
 	{
+		//Apply the turn and redraw the board
 		board = turn.ApplyTurn(board) as ConnectKBoard;
 		DrawBoard();
+		//check to see if the game is over
 		if(board.IsTerminal())
 			Debug.Log ("Game over");
 		else
@@ -52,7 +65,6 @@ public class ConnectK : MonoBehaviour
 
 	void InitBoard()
 	{
-		//gridSize = gridSquare.renderer.bounds.size.x;
 		bottomLeft = -(new Vector2(width/2f - gridSize/2f,height/2f - gridSize/2f));
 		for(int i = 0; i < width; i++) {
 			for(int j = 0; j < height; j++) {

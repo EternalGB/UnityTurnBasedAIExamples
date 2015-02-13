@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UniversalTurnBasedAI;
 using UnityEngine.UI;
 
+/// <summary>
+/// The Human player for Connect K. Creates and manages a bunch of buttons used
+/// to create Turns.
+/// </summary>
 public class ConnectKHumanPlayer : TurnAgent
 {
 
@@ -10,8 +14,6 @@ public class ConnectKHumanPlayer : TurnAgent
 	public GameObject buttonPrefab;
 	public Color ourColor;
 	public ConnectKPiece player;
-	//public int gridSize;
-
 
 	List<Button> buttons;
 
@@ -30,6 +32,7 @@ public class ConnectKHumanPlayer : TurnAgent
 		Vector2 topLeft = (new Vector2(-(board.nCols/2),board.nCols/2 + gridSize/2));
 
 		buttons = new List<Button>();
+		//create and place each button
 		for(int i = 0; i < board.nCols; i++) {
 			GameObject buttonObj = (GameObject)Instantiate(buttonPrefab, topLeft + new Vector2(gridSize*i,0), Quaternion.identity);
 			buttonObj.GetComponent<Image>().color = ourColor;
@@ -51,9 +54,9 @@ public class ConnectKHumanPlayer : TurnAgent
 
 	public override void GenerateNextTurn(GameState state)
 	{
-		Debug.Log (name + " generating turn");
 		ConnectKBoard board = state as ConnectKBoard;
 		buttonCanvas.gameObject.SetActive(true);
+		//disable the button if the column is full
 		for(int i = 0; i < buttons.Count; i++) {
 			if(board.ColumnFull(i))
 				buttons[i].interactable = false;

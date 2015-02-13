@@ -3,6 +3,24 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 
+/// <summary>
+/// Our internal representation of the Connect K game state. Uses a 2 dimensional array
+/// of <see cref="ConnectKPiece"/> to represent the board. Also keeps track of all of the
+/// possible "lines" which are the rows, columns and diagonals on the board that are long
+/// enough to fit "k" pieces, as well as a dictionary that maps board positions to the lines
+/// that they lie on. 
+/// 
+/// For each line we also create a dictionary that counts the total number 
+/// of pieces for each player on that line and a dictionary that tracks whether or not that
+/// line has been checked for victory since the move was made. This helps speed up the 
+/// terminal checks and evaluation functions as we only have to iterate through the lines that
+/// have been changed rather than the entire board.
+/// 
+/// <seealso cref="ConnectKPiece"/>
+/// <seealso cref="ConnectKTurn"/>
+/// <see cref="ConnectKEvaluator"/>
+/// <seealso cref="Line"/>
+/// </summary>
 public class ConnectKBoard : GameState
 {
 
@@ -15,6 +33,9 @@ public class ConnectKBoard : GameState
 	{
 		get{return board.GetLength(0);}
 	}
+	/// <summary>
+	/// The number of matches required
+	/// </summary>
 	public int k;
 
 	public ConnectKPiece player;
@@ -32,6 +53,12 @@ public class ConnectKBoard : GameState
 	public Dictionary<Line, bool> dirty;
 	
 
+	/// <summary>
+	/// Initializes a new instance of the <see cref="ConnectKBoard"/> class.
+	/// </summary>
+	/// <param name="numColumns">Number columns.</param>
+	/// <param name="numRows">Number rows.</param>
+	/// <param name="numMatches">Number matches required to win</param>
 	public ConnectKBoard(int numColumns, int numRows, int numMatches)
 	{
 		Debug.Log (string.Format("New Board: {0} X {1}    {2} matches needed",numColumns,numRows,numMatches));
@@ -59,7 +86,12 @@ public class ConnectKBoard : GameState
 
 	}
 
-	//clone constructor
+	/// <summary>
+	/// The clone constructor. Initiates a new <see cref="ConnectKBoard"/> using relevant information
+	/// from <paramref name="oldBoard"/>. Copies a reference to the line list and deep copies the
+	/// piece counts and dirty dictionaries.
+	/// </summary>
+	/// <param name="oldBoard">Old board.</param>
 	public ConnectKBoard(ConnectKBoard oldBoard)
 	{
 		board = new ConnectKPiece[oldBoard.nCols, oldBoard.nRows];
@@ -85,6 +117,9 @@ public class ConnectKBoard : GameState
 		}
 	}
 
+	/// <summary>
+	/// Initialises <param name="allLines"> and <param name="lineDict">
+	/// </summary>
 	void InitLines()
 	{
 		allLines = GetLines(nCols,nRows,k);
@@ -109,7 +144,13 @@ public class ConnectKBoard : GameState
 		}
 	}
 
-	//precompute a bunch of stuff
+	/// <summary>
+	/// Gets the lines.
+	/// </summary>
+	/// <returns>The lines.</returns>
+	/// <param name="nCols">N cols.</param>
+	/// <param name="nRows">N rows.</param>
+	/// <param name="k">K.</param>
 	public static List<Line> GetLines(int nCols, int nRows, int k)
 	{
 		List<Line> allLines = new List<Line>();
@@ -158,6 +199,12 @@ public class ConnectKBoard : GameState
 		return cols;
 	}
 
+	/// <summary>
+	/// Determines if position (x,y) has descending diagonal line which could make a match on this board
+	/// </summary>
+	/// <returns><c>true</c> if this instance has descending diagonal; otherwise, <c>false</c>.</returns>
+	/// <param name="x">The x coordinate.</param>
+	/// <param name="y">The y coordinate.</param>
 	public bool HasDescendingDiagonal(int x, int y)
 	{
 		int p = nRows;
@@ -165,11 +212,16 @@ public class ConnectKBoard : GameState
 		return y >= (k-1)-x && y <= (q+p-k-1)-x;
 	}
 
+	/// <summary>
+	/// Determines if position (x,y) has ascending diagonal line which could make a match on this board
+	/// </summary>
+	/// <returns><c>true</c> if this instance has ascending diagonal; otherwise, <c>false</c>.</returns>
+	/// <param name="x">The x coordinate.</param>
+	/// <param name="y">The y coordinate.</param>
 	public bool HasAscendingDiagonal(int x, int y)
 	{
 		int p = nRows;
 		int q = nCols;
-		//Debug.Log(string.Format("({0},{1}) - {5}: {1} >= {0} - ({3}-{4}) && {1} < {0} + ({2}-{4}))",x,y,p,q,k,result));
 		return y >= x - (q-k) && y <= x + (p-k);
 	}
 
@@ -183,9 +235,14 @@ public class ConnectKBoard : GameState
 		return lineDict[pos];
 	}
 
+	/// <summary>
+	/// Adds a piece to the given column. Does not check if the column is full
+	/// </summary>
+	/// <param name="piece">Piece.</param>
+	/// <param name="column">Column.</param>
 	public void AddPiece(ConnectKPiece piece, int column)
 	{
-
+		//find the correct row by "simulating" gravity
 		int actualY = nRows-1;
 		for(int y = 0; y < nRows; y++) {
 			if(board[column,y] == ConnectKPiece.None) {
@@ -195,6 +252,7 @@ public class ConnectKBoard : GameState
 		}
 		IntVector2 pos = new IntVector2(column,actualY);
 		board[pos.x,pos.y] = piece;
+		//determine which piece count to update
 		Dictionary<Line,float> dict;
 		if(piece == ConnectKPiece.P1)
 			dict = p1Count;
@@ -202,7 +260,7 @@ public class ConnectKBoard : GameState
 			dict = p2Count;
 
 		List<Line> lines = GetLines(pos);
-		//this ensures that we only have to check rows/columns/diagonals that have actually had changes
+		//Update the piece counts and dirty dictionary
 		foreach(Line line in lines) {
 			dict[line] += 1;
 			if(dict[line] >= k)
@@ -210,36 +268,50 @@ public class ConnectKBoard : GameState
 		}
 	}
 
+	/// <summary>
+	/// Search the line list for altered lines and determine if any have 'k' in a row
+	/// </summary>
+	/// <returns><c>true</c>, if there are 'k' in a row pieces, <c>false</c> otherwise.</returns>
 	bool CheckMatches()
 	{
 		bool result = false;
 		foreach(Line line in allLines) {
 			if((p1Count[line] >= k || p2Count[line] >= k) && dirty[line]) {
-				result = result || CheckMatch(line.start.x,line.start.y,line.dir.x,line.dir.y);
+				result = result || CheckLine(line);
 				dirty[line] = false;
 			}
 		}
 		return result;
 	}
 
-	bool CheckMatch(int xStart, int yStart, int xDir, int yDir)
+	/// <summary>
+	/// Check a single line for 'k' in a row
+	/// </summary>
+	/// <returns><c>true</c>, if the line has 'k' in a row, <c>false</c> otherwise.</returns>
+	/// <param name="line>Line to check</para>
+	bool CheckLine(Line line)
 	{
-
 		int count = 0;
-		ConnectKPiece piece = board[xStart,yStart];
-		int x = xStart;
-		int y = yStart;
+		ConnectKPiece piece = board[line.start.x,line.start.y];
+		if(piece != ConnectKPiece.None)
+			count++;
+		int x = line.start.x + line.dir.x;
+		int y = line.start.y + line.dir.y;
 		while(x >= 0 && x < nCols && y >= 0 && y < nRows) {
-			if(board[x,y] == piece)
-				count++;
-			else {
-				piece = board[x,y];
-				count = 1;
+			if(board[x,y] != ConnectKPiece.None) {
+				if(board[x,y] == piece)
+					count++;
+				else
+					count = 1;
+			} else {
+				count = 0;
 			}
 			if(count >= k)
 				return true;
-			x += xDir;
-			y += yDir;
+
+			piece = board[x,y];
+			x += line.dir.x;
+			y += line.dir.y;
 		}
 		return count >= k;
 	}
@@ -288,6 +360,12 @@ public class ConnectKBoard : GameState
 
 }
 
+/// <summary>
+/// Represents a sequences of positions on the board using a starting position
+/// somewhere on the side of the board and a direction to step in. Also overrides
+/// GetHashCode and Equals so that it can be used as a Dictionary key without
+/// reference equality
+/// </summary>
 public class Line
 {
 	public IntVector2 start;
@@ -318,6 +396,10 @@ public class Line
 	
 }
 
+/// <summary>
+/// A convenience class for holding two ints that can be
+/// stored in a Dictionary without using reference equality
+/// </summary>
 public class IntVector2
 {
 

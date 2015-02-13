@@ -1,5 +1,10 @@
 using UniversalTurnBasedAI;
 
+/// <summary>
+/// Our representation of a Turn in Connect K. Records the column
+/// to place the piece and what piece is being placed. Calls 
+/// <see cref="ConnectKBoard.AddPiece"/> to perform the move.
+/// </summary>
 public class ConnectKTurn : Turn
 {
 

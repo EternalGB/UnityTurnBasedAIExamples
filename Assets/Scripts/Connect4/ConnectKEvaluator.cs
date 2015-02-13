@@ -3,6 +3,15 @@ using System.Collections.Generic;
 using UniversalTurnBasedAI;
 using System;
 
+/// <summary>
+/// Connect K evaluator. Uses a weighted sum approach, counting the number of pieces that
+/// the player could potential connect on each row and the maximum number of connected pieces
+/// on each line where there is still room to play a piece. Then subtracts the sum of the
+/// opponent's count.
+/// 
+/// If the player wins on the evaluated board, gives <see cref="maxValue"/>, if the opponent 
+/// wins gives <see cref="minValue"/>.
+/// </summary>
 public class ConnectKEvaluator : Evaluator
 {
 

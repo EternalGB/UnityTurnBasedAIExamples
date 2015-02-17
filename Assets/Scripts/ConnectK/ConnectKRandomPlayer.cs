@@ -11,7 +11,7 @@ public class ConnectKRandomPlayer : TurnAgent
 	public ConnectKPiece player;
 	TurnEngine engine;
 	
-	public override void Init (GameState state)
+	public override void Init (IGameState state)
 	{
 		//intialise turn engines
 		ConnectKBoard board = state as ConnectKBoard;
@@ -23,7 +23,7 @@ public class ConnectKRandomPlayer : TurnAgent
 	/// Passes the turn ready event up from the TurnEngine 
 	/// </summary>
 	/// <param name="bestTurn">Best turn.</param>
-	void HandleTurnReadyEvent (Turn bestTurn)
+	void HandleTurnReadyEvent (ITurn bestTurn)
 	{
 		OnTurnReady(bestTurn);
 		Debug.Log (System.Enum.GetName(typeof(ConnectKPiece),player) + " : " + engine.Stats.ToString());
@@ -34,7 +34,7 @@ public class ConnectKRandomPlayer : TurnAgent
 	/// Wrapper for the TurnEngine call
 	/// </summary>
 	/// <param name="state">State.</param>
-	public override void GenerateNextTurn (GameState state)
+	public override void GenerateNextTurn (IGameState state)
 	{
 		StartCoroutine(engine.GetNextTurn(state));
 	}

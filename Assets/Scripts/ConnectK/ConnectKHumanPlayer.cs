@@ -17,7 +17,7 @@ public class ConnectKHumanPlayer : TurnAgent
 
 	List<Button> buttons;
 
-	public override void Init(GameState state) 
+	public override void Init(IGameState state) 
 	{
 		ConnectKBoard board = state as ConnectKBoard;
 		InitButtons(board,1);
@@ -52,7 +52,7 @@ public class ConnectKHumanPlayer : TurnAgent
 	}
 	
 
-	public override void GenerateNextTurn(GameState state)
+	public override void GenerateNextTurn(IGameState state)
 	{
 		ConnectKBoard board = state as ConnectKBoard;
 		buttonCanvas.gameObject.SetActive(true);

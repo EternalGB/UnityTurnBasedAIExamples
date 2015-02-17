@@ -14,7 +14,7 @@ public class TTTEvaluator : Evaluator
 		this.player = player;
 	}
 
-	public override float Evaluate (GameState state)
+	public override float Evaluate (IGameState state)
 	{
 		TTTBoard board = (TTTBoard)state;
 		if(board.Winner(player))
@@ -24,10 +24,6 @@ public class TTTEvaluator : Evaluator
 		else
 			return 0;
 	}
-
-	public override Evaluator Clone()
-	{
-		return new TTTEvaluator(player);
-	}
+	
 
 }

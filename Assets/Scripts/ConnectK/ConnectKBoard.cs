@@ -21,7 +21,7 @@ using System;
 /// <see cref="ConnectKEvaluator"/>
 /// <seealso cref="Line"/>
 /// </summary>
-public class ConnectKBoard : GameState
+public class ConnectKBoard : IGameState
 {
 
 	ConnectKPiece[,] board;
@@ -52,6 +52,8 @@ public class ConnectKBoard : GameState
 	//prevents us from checking every start with count above k that will never have any matches (is full)
 	public Dictionary<Line, bool> dirty;
 	
+	//is set to true if CheckMatches returns true
+	bool terminal;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="ConnectKBoard"/> class.
@@ -84,6 +86,7 @@ public class ConnectKBoard : GameState
 			dirty.Add(line,false);
 		}
 
+		terminal = false;
 	}
 
 	/// <summary>
@@ -115,6 +118,8 @@ public class ConnectKBoard : GameState
 			p2Count.Add(line,oldBoard.p2Count[line]);
 			dirty.Add(line,oldBoard.dirty[line]);
 		}
+
+		terminal = oldBoard.terminal;
 	}
 
 	/// <summary>
@@ -274,6 +279,8 @@ public class ConnectKBoard : GameState
 	/// <returns><c>true</c>, if there are 'k' in a row pieces, <c>false</c> otherwise.</returns>
 	bool CheckMatches()
 	{
+		if(terminal)
+			return true;
 		bool result = false;
 		foreach(Line line in allLines) {
 			if((p1Count[line] >= k || p2Count[line] >= k) && dirty[line]) {
@@ -281,6 +288,8 @@ public class ConnectKBoard : GameState
 				dirty[line] = false;
 			}
 		}
+		if(result)
+			terminal = true;
 		return result;
 	}
 
@@ -335,17 +344,36 @@ public class ConnectKBoard : GameState
 		return result;
 	}
 
+	public ConnectKPiece GetPiece(IntVector2 pos)
+	{
+		return GetPiece(pos.x,pos.y);
+	}
+
 	public ConnectKPiece GetPiece(int x, int y)
 	{
 		return board[x,y];
 	}
 
-	public override bool IsTerminal ()
+	public bool IsTerminal ()
 	{
 		return CheckMatches() || IsBoardFull();
 	}
 
-	public override System.Collections.Generic.IEnumerable<Turn> GeneratePossibleTurns ()
+	public Line GetWinningLine()
+	{
+		if(IsTerminal()) {
+			foreach(Line line in allLines) {
+				if((p1Count[line] >= k || p2Count[line] >= k) && CheckLine(line)) {
+					return line;
+				}
+			}
+			return null;
+		} else {
+			return null;
+		}
+	}
+
+	public System.Collections.Generic.IEnumerable<ITurn> GeneratePossibleTurns ()
 	{
 		for(int x = 0; x < nCols; x++) {
 			if(board[x,nRows-1] == ConnectKPiece.None)
@@ -353,7 +381,7 @@ public class ConnectKBoard : GameState
 		}
 	}
 
-	public override GameState Clone ()
+	public IGameState Clone ()
 	{
 		return new ConnectKBoard(this);
 	}
@@ -409,6 +437,12 @@ public class IntVector2
 	{
 		this.x = x;
 		this.y = y;
+	}
+
+	public IntVector2(IntVector2 vec)
+	{
+		x = vec.x;
+		y = vec.y;
 	}
 
 	public override int GetHashCode ()

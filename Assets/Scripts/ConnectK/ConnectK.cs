@@ -10,7 +10,7 @@ using UniversalTurnBasedAI;
 /// </summary>
 public class ConnectK : MonoBehaviour 
 {
-	public GameObject gridSquare;
+	public GameObject gridSquare, winSquare;
 	public float gridSize;
 	public GameObject p1Piece, p2Piece;
 	Vector2 bottomLeft;
@@ -51,15 +51,23 @@ public class ConnectK : MonoBehaviour
 		}
 	}
 
-	void ReceiveTurn(Turn turn)
+	void ReceiveTurn(ITurn turn)
 	{
 		//Apply the turn and redraw the board
 		board = turn.ApplyTurn(board) as ConnectKBoard;
 		DrawBoard();
 		//check to see if the game is over
-		if(board.IsTerminal())
+		if(board.IsTerminal()) {
+			ConnectKPiece winner;
+			if(board.player == ConnectKPiece.P1)
+				winner = ConnectKPiece.P2;
+			else
+				winner = ConnectKPiece.P1;
+			Line winLine = board.GetWinningLine();
+			if(winLine != null)
+				DrawVictory(winLine, winner);
 			Debug.Log ("Game over");
-		else
+		} else
 			PlayTurn();
 	}
 
@@ -86,6 +94,41 @@ public class ConnectK : MonoBehaviour
 				} else if(board.GetPiece(x,y) == ConnectKPiece.P2){
 					lastPieces.Add((GameObject)Instantiate(p2Piece, GetRealPosition(x,y), Quaternion.identity));
 				}
+			}
+		}
+	}
+
+	void DrawVictory(Line line, ConnectKPiece winner)
+	{
+		ConnectKPiece lastPiece = board.GetPiece(line.start);
+		int x = line.start.x + line.dir.x;
+		int y = line.start.y + line.dir.y;
+		int count = 0;
+		IntVector2 winStart = line.start;
+		if(lastPiece == winner) {
+			count = 1;
+		}
+		while(x >= 0 && x < board.nCols && y >= 0 && y < board.nRows) {
+			if(board.GetPiece(x,y) == winner) {
+				if(lastPiece != winner)
+					winStart = new IntVector2(x,y);
+				count++;
+			} else {
+				if(count >= board.k)
+					break;
+				count = 0;
+			}
+			lastPiece = board.GetPiece(x,y);
+			x += line.dir.x;
+			y += line.dir.y;
+		}
+		if(count >= board.k) {
+			x = winStart.x;
+			y = winStart.y;
+			for(int i = 0; i < count; i++) {
+				Instantiate(winSquare, GetRealPosition(x,y), Quaternion.identity);
+				x += line.dir.x;
+				y += line.dir.y;
 			}
 		}
 	}

@@ -37,17 +37,7 @@ public class ConnectKEvaluator : Evaluator
 		minValue = -maxValue;
 	}
 
-	public ConnectKEvaluator(ConnectKEvaluator oldEval)
-	{
-		allLines = oldEval.allLines;
-		player = oldEval.player;
-		opponent = oldEval.opponent;
-		k = oldEval.k;
-		maxValue = oldEval.maxValue;
-		minValue = oldEval.minValue;
-	}
-
-	public override float Evaluate (GameState state)
+	public override float Evaluate (IGameState state)
 	{
 		ConnectKBoard board = state as ConnectKBoard;
 		Dictionary<Line, float> playerCount;
@@ -138,11 +128,6 @@ public class ConnectKEvaluator : Evaluator
 			y += line.dir.y;
 		}
 		return total;
-	}
-
-	public override Evaluator Clone ()
-	{
-		return new ConnectKEvaluator(this);
 	}
 
 }

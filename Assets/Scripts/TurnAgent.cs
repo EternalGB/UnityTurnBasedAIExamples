@@ -10,24 +10,24 @@ using UniversalTurnBasedAI;
 public abstract class TurnAgent : MonoBehaviour
 {
 
-	public delegate void TurnReady(Turn bestTurn);
+	public delegate void TurnReady(ITurn bestTurn);
 	public event TurnReady TurnReadyEvent;
 
-	public abstract void Init(GameState state);
+	public abstract void Init(IGameState state);
 
 	/// <summary>
 	/// Generate the next turn. After this call has been made <see cref="OnTurnReady"/>
 	/// should be used to return the Turn.
 	/// </summary>
 	/// <param name="state">State.</param>
-	public abstract void GenerateNextTurn(GameState state);
+	public abstract void GenerateNextTurn(IGameState state);
 
 	/// <summary>
 	/// Raises the turn ready event. Implementing classes should call this
 	/// when they have a turn ready to play
 	/// </summary>
 	/// <param name="turn">Turn.</param>
-	protected virtual void OnTurnReady(Turn turn)
+	protected virtual void OnTurnReady(ITurn turn)
 	{
 		if(TurnReadyEvent != null)
 			TurnReadyEvent(turn);

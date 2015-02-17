@@ -5,7 +5,7 @@ using UniversalTurnBasedAI;
 /// to place the piece and what piece is being placed. Calls 
 /// <see cref="ConnectKBoard.AddPiece"/> to perform the move.
 /// </summary>
-public class ConnectKTurn : Turn
+public class ConnectKTurn : ITurn
 {
 
 	int column;
@@ -17,7 +17,7 @@ public class ConnectKTurn : Turn
 		this.piece = piece;
 	}
 
-	public override GameState ApplyTurn (GameState state)
+	public IGameState ApplyTurn (IGameState state)
 	{
 		ConnectKBoard board = state as ConnectKBoard;
 		board = board.Clone() as ConnectKBoard;

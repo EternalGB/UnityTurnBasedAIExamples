@@ -3,7 +3,7 @@ using UniversalTurnBasedAI;
 /// <summary>
 /// A Tic Tac Toe turn
 /// </summary>
-public class TTTTurn : Turn
+public class TTTTurn : ITurn
 {
 
 	int x;
@@ -15,7 +15,7 @@ public class TTTTurn : Turn
 		this.player = player;
 	}
 
-	public override GameState ApplyTurn (GameState state)
+	public IGameState ApplyTurn (IGameState state)
 	{
 		TTTBoard board = (TTTBoard)state;
 		board.SetPiece(x,player);

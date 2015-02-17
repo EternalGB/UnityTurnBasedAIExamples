@@ -3,7 +3,7 @@ using UniversalTurnBasedAI;
 /// <summary>
 /// Internal representation of our Tic Tac Toe board
 /// </summary>
-public class TTTBoard : GameState
+public class TTTBoard : IGameState
 {
 
 	public enum TTTPiece
@@ -62,7 +62,7 @@ public class TTTBoard : GameState
 		this.player = player;
 	}
 
-	public override bool IsTerminal ()
+	public bool IsTerminal ()
 	{
 		bool boardFull = true;
 		bool match = false;
@@ -87,19 +87,14 @@ public class TTTBoard : GameState
 
 	public bool Loser(TTTPiece player)
 	{
-		bool winner = false;
 		if(player == TTTPiece.O)
 			player = TTTPiece.X;
 		else
 			player = TTTPiece.O;
-		foreach(int[] line in lines) {
-			winner = winner || 
-				(board[line[0]] == player && board[line[1]] == player && board[line[2]] == player);
-		}
-		return winner;
+		return Winner(player);
 	}
 
-	public override System.Collections.Generic.IEnumerable<Turn> GeneratePossibleTurns ()
+	public System.Collections.Generic.IEnumerable<ITurn> GeneratePossibleTurns ()
 	{
 		for(int i = 0; i < Size; i++) {
 			if(board[i] == TTTPiece.None)
@@ -107,7 +102,7 @@ public class TTTBoard : GameState
 		}
 	}
 
-	public override GameState Clone ()
+	public IGameState Clone ()
 	{
 		return new TTTBoard(this);
 	}

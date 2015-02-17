@@ -63,7 +63,7 @@ public class TicTacToe : MonoBehaviour
 		Invoke("CancelMinWait",minWaitingTime);
 	}
 
-	void ReceiveTurn(Turn turn)
+	void ReceiveTurn(ITurn turn)
 	{
 
 		//Debug.Log (gameBoard.ToString());

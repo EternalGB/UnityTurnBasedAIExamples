@@ -12,7 +12,7 @@ using System;
 /// If the player wins on the evaluated board, gives <see cref="maxValue"/>, if the opponent 
 /// wins gives <see cref="minValue"/>.
 /// </summary>
-public class ConnectKEvaluator : Evaluator
+public class ConnectKEvaluator : IEvaluator
 {
 
 	const float 
@@ -23,6 +23,8 @@ public class ConnectKEvaluator : Evaluator
 	ConnectKPiece opponent;
 	List<Line> allLines;
 	int k;
+
+	float minValue, maxValue;
 
 	public ConnectKEvaluator(ConnectKPiece player, int width, int height, int k)
 	{
@@ -37,7 +39,17 @@ public class ConnectKEvaluator : Evaluator
 		minValue = -maxValue;
 	}
 
-	public override float Evaluate (IGameState state)
+	public float GetMinValue()
+	{
+		return minValue;
+	}
+
+	public float GetMaxValue()
+	{
+		return maxValue;
+	}
+
+	public float Evaluate (IGameState state)
 	{
 		ConnectKBoard board = state as ConnectKBoard;
 		Dictionary<Line, float> playerCount;

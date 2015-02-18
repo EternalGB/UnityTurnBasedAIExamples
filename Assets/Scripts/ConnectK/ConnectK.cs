@@ -19,21 +19,109 @@ public class ConnectK : MonoBehaviour
 
 	ConnectKBoard board;
 	List<GameObject> lastPieces;
+	List<GameObject> vicSquares;
+	List<GameObject> boardSquares;
 
-	public TurnAgent p1;
-	public TurnAgent p2;
+	public ConnectKHumanPlayer humanP1, humanP2;
+	public ConnectKAIPlayer aiP1, aiP2;
+
+	TurnAgent p1;
+	TurnAgent p2;
+
+	bool preGame = false;
+	bool gameEnd = false;
+	string[] agentOptions = {"Human", "AI"};
+	int p1AgentSelection = 0, p2AgentSelection = 1;
+	//float p1TimeLimit = 0.1f, p2TimeLimit = 0.1f;
+	//bool p1MultiThreaded = false, p2MultiThreaded = false;
 
 	void Start()
 	{
+		preGame = true;
+	}
+
+	void OnGUI()
+	{
+		GUILayout.BeginArea(new Rect(0,Screen.height/3,Screen.width,2*Screen.height/3));
+		if(preGame) {
+
+			GUILayout.BeginVertical();
+
+			GUILayout.BeginHorizontal();
+
+			GUILayout.BeginVertical();
+			GUILayout.Label("Player 1");
+			p1AgentSelection = GUILayout.SelectionGrid(p1AgentSelection, agentOptions, 1, GUILayout.Width(Screen.width/2));
+			if(p1AgentSelection == 1) {
+				GUILayout.Label ("Thinking Time");
+				GUILayout.Label(aiP1.timeLimit + " seconds");
+				aiP1.timeLimit = GUILayout.HorizontalSlider(aiP1.timeLimit,0.1f,15f, GUILayout.Width(Screen.width/2));
+				aiP1.multiThreaded = GUILayout.Toggle(aiP1.multiThreaded,"Multi-Threaded");
+			}
+			GUILayout.EndVertical();
+
+			GUILayout.BeginVertical();
+			GUILayout.Label("Player 2");
+			p2AgentSelection = GUILayout.SelectionGrid(p2AgentSelection, agentOptions, 1, GUILayout.Width(Screen.width/2));
+			if(p2AgentSelection == 1) {
+				GUILayout.Label ("Thinking Time");
+				GUILayout.Label(aiP2.timeLimit + " seconds");
+				aiP2.timeLimit = GUILayout.HorizontalSlider(aiP2.timeLimit,0.1f,15f, GUILayout.Width(Screen.width/2));
+				aiP2.multiThreaded = GUILayout.Toggle(aiP2.multiThreaded,"Multi-Threaded");
+			}
+			GUILayout.EndVertical();
+
+			GUILayout.EndHorizontal();
+
+			if(GUILayout.Button("Start")) {
+
+				StartNewGame();
+			}
+			GUILayout.EndVertical();
+
+		} else if(gameEnd) {
+			GUILayout.BeginVertical();
+			if(GUILayout.Button("Menu")) {
+				gameEnd = false;
+				ClearBoard();
+				DestroyBoard();
+				preGame = true;
+			}
+			if(GUILayout.Button("Restart")) {
+				gameEnd = false;
+				ClearBoard();
+				StartNewGame();
+			}
+			GUILayout.EndVertical();
+		}
+		GUILayout.EndArea();
+	}
+
+	void StartNewGame()
+	{
+		if(p1AgentSelection == 0) {
+			p1 = humanP1;
+		} else {
+			p1 = aiP1;
+		}
+		
+		if(p2AgentSelection == 0) {
+			p2 = humanP2;
+		} else {
+			p2 = aiP2;
+		}
+
+
+		preGame = false;
 		//create our internal board representation
 		board = new ConnectKBoard(width,height,matches);
 		InitBoard();
 		lastPieces = new List<GameObject>();
-
+		
 		//initialise our turn agents
 		p1.Init(board);
 		p2.Init(board);
-
+		
 		//register to receive and process turns
 		p1.TurnReadyEvent += ReceiveTurn;
 		p2.TurnReadyEvent += ReceiveTurn;
@@ -67,23 +155,34 @@ public class ConnectK : MonoBehaviour
 			if(winLine != null)
 				DrawVictory(winLine, winner);
 			Debug.Log ("Game over");
+			gameEnd = true;
+
+			p1.TurnReadyEvent -= ReceiveTurn;
+			p2.TurnReadyEvent -= ReceiveTurn;
+
 		} else
 			PlayTurn();
 	}
 
 	void InitBoard()
 	{
+		if(boardSquares == null)
+			boardSquares = new List<GameObject>();
+
 		bottomLeft = -(new Vector2(width/2f - gridSize/2f,height/2f - gridSize/2f));
 		for(int i = 0; i < width; i++) {
 			for(int j = 0; j < height; j++) {
 				Vector2 pos = GetRealPosition(i,j);
 				GameObject square = (GameObject)Instantiate(gridSquare,pos,Quaternion.identity);
+				boardSquares.Add(square);
 			}
 		}
+		//TODO resize camera
 	}
 
 	void DrawBoard()
 	{
+
 		foreach(GameObject piece in lastPieces)
 			Destroy(piece);
 		lastPieces.Clear();
@@ -98,8 +197,30 @@ public class ConnectK : MonoBehaviour
 		}
 	}
 
+	void ClearBoard()
+	{
+		foreach(GameObject piece in lastPieces)
+			Destroy(piece);
+		lastPieces.Clear();
+
+		foreach(GameObject square in vicSquares)
+			Destroy(square);
+		vicSquares.Clear();
+	}
+
+	void DestroyBoard()
+	{
+		if(boardSquares != null) {
+			foreach(GameObject square in boardSquares)
+				Destroy(square);
+			boardSquares.Clear();
+		}
+
+	}
+
 	void DrawVictory(Line line, ConnectKPiece winner)
 	{
+		vicSquares = new List<GameObject>();
 		ConnectKPiece lastPiece = board.GetPiece(line.start);
 		int x = line.start.x + line.dir.x;
 		int y = line.start.y + line.dir.y;
@@ -126,7 +247,7 @@ public class ConnectK : MonoBehaviour
 			x = winStart.x;
 			y = winStart.y;
 			for(int i = 0; i < count; i++) {
-				Instantiate(winSquare, GetRealPosition(x,y), Quaternion.identity);
+				vicSquares.Add(Instantiate(winSquare, GetRealPosition(x,y), Quaternion.identity) as GameObject);
 				x += line.dir.x;
 				y += line.dir.y;
 			}

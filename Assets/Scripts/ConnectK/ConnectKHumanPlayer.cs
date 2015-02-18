@@ -9,60 +9,44 @@ using UnityEngine.UI;
 /// </summary>
 public class ConnectKHumanPlayer : TurnAgent
 {
-
-	public RectTransform buttonCanvas;
-	public GameObject buttonPrefab;
-	public Color ourColor;
+	
 	public ConnectKPiece player;
 
-	List<Button> buttons;
+	public Sprite buttonImage;
+	ConnectKBoard board;
+	float gridSize = 1;
+	float buttonSize;
+	bool ourTurn;
 
 	public override void Init(IGameState state) 
 	{
-		ConnectKBoard board = state as ConnectKBoard;
-		InitButtons(board,1);
+		board = state as ConnectKBoard;
+		Vector3 diff = Camera.main.WorldToScreenPoint(new Vector3(gridSize,0)) - Camera.main.WorldToScreenPoint(Vector3.zero);
+		buttonSize = Mathf.Abs(diff.x);
+		ourTurn = player == board.player;
 	}
 
-	void InitButtons(ConnectKBoard board, float gridSize)
+	void OnGUI()
 	{
-
-		buttonCanvas.position = new Vector3(0,gridSize/2);
-		buttonCanvas.sizeDelta = new Vector2(board.nCols*gridSize, board.nRows*gridSize + gridSize);
-
-		Vector2 topLeft = (new Vector2(-(board.nCols/2),board.nCols/2 + gridSize/2));
-
-		buttons = new List<Button>();
-		//create and place each button
-		for(int i = 0; i < board.nCols; i++) {
-			GameObject buttonObj = (GameObject)Instantiate(buttonPrefab, topLeft + new Vector2(gridSize*i,0), Quaternion.identity);
-			buttonObj.GetComponent<Image>().color = ourColor;
-			RectTransform trans = buttonObj.transform as RectTransform;
-			trans.sizeDelta = new Vector2(gridSize,gridSize);
-			trans.SetParent(buttonCanvas);
-			Button button = buttonObj.GetComponent<Button>();
-			int index = i;
-			//register the button to generate the actual turn
-			button.onClick.AddListener( () =>  {
-				OnTurnReady(new ConnectKTurn(index,player));
-				buttonCanvas.gameObject.SetActive(false);
-			});
-			buttons.Add(button);
-		}
-		buttonCanvas.gameObject.SetActive(false);
+		if(board != null && ourTurn) {
+			Vector3 topLeft = (new Vector2(-(board.nCols/2) - gridSize/2,board.nRows/2 + gridSize));
+			
+			for(int i = 0; i < board.nCols; i++) {
+				Vector3 offset = new Vector3(gridSize*i,0);
+				Vector3 pos = Camera.main.WorldToScreenPoint(topLeft + offset);
+				if(GUI.Button(new Rect(pos.x,Screen.height - pos.y,buttonSize,buttonSize),buttonImage.texture)) {
+					OnTurnReady(new ConnectKTurn(i,player));
+					ourTurn = false;
+				}
+			}
+		} 
 	}
-	
 
 	public override void GenerateNextTurn(IGameState state)
 	{
 		ConnectKBoard board = state as ConnectKBoard;
-		buttonCanvas.gameObject.SetActive(true);
-		//disable the button if the column is full
-		for(int i = 0; i < buttons.Count; i++) {
-			if(board.ColumnFull(i))
-				buttons[i].interactable = false;
-			else
-				buttons[i].interactable = true;
-		}
+		this.board = board;
+		ourTurn = player == board.player;
 	}
 
 

@@ -24,13 +24,14 @@ public class ConnectK : MonoBehaviour
 
 	public ConnectKHumanPlayer humanP1, humanP2;
 	public ConnectKAIPlayer aiP1, aiP2;
+	public ConnectKRandomPlayer randomP1, randomP2;
 
 	TurnAgent p1;
 	TurnAgent p2;
 
 	bool preGame = false;
 	bool gameEnd = false;
-	string[] agentOptions = {"Human", "AI"};
+	string[] agentOptions = {"Human", "AI", "Random"};
 	int p1AgentSelection = 0, p2AgentSelection = 1;
 
 	void Start()
@@ -106,14 +107,18 @@ public class ConnectK : MonoBehaviour
 	{
 		if(p1AgentSelection == 0) {
 			p1 = humanP1;
-		} else {
+		} else if(p1AgentSelection == 1) {
 			p1 = aiP1;
+		} else if(p1AgentSelection == 2) {
+			p1 = randomP1;
 		}
 		
 		if(p2AgentSelection == 0) {
 			p2 = humanP2;
-		} else {
+		} else if(p2AgentSelection == 1) {
 			p2 = aiP2;
+		} else if(p2AgentSelection == 2) {
+			p2 = randomP2;
 		}
 
 

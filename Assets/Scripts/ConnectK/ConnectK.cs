@@ -22,6 +22,8 @@ public class ConnectK : MonoBehaviour
 	List<GameObject> vicSquares;
 	List<GameObject> boardSquares;
 
+	public GUISkin p1GUISkin, p2GUISkin;
+
 	public ConnectKHumanPlayer humanP1, humanP2;
 	public ConnectKAIPlayer aiP1, aiP2;
 	public ConnectKRandomPlayer randomP1, randomP2;
@@ -44,13 +46,16 @@ public class ConnectK : MonoBehaviour
 	/// </summary>
 	void OnGUI()
 	{
-		GUILayout.BeginArea(new Rect(0,Screen.height/3,Screen.width,2*Screen.height/3));
+		GUISkin defaultSkin = GUI.skin;
+
+		GUILayout.BeginArea(new Rect(0,Screen.height/4,Screen.width,3*Screen.height/4));
 		if(preGame) {
 
 			GUILayout.BeginVertical();
 
 			GUILayout.BeginHorizontal();
 
+			GUI.skin = p1GUISkin;
 			GUILayout.BeginVertical();
 			GUILayout.Label("Player 1");
 			p1AgentSelection = GUILayout.SelectionGrid(p1AgentSelection, agentOptions, 1, GUILayout.Width(Screen.width/2));
@@ -62,6 +67,7 @@ public class ConnectK : MonoBehaviour
 			}
 			GUILayout.EndVertical();
 
+			GUI.skin = p2GUISkin;
 			GUILayout.BeginVertical();
 			GUILayout.Label("Player 2");
 			p2AgentSelection = GUILayout.SelectionGrid(p2AgentSelection, agentOptions, 1, GUILayout.Width(Screen.width/2));
@@ -75,9 +81,11 @@ public class ConnectK : MonoBehaviour
 
 			GUILayout.EndHorizontal();
 
-			width = GUILayoutIntField("Board Width",width,1,int.MaxValue);
-			height = GUILayoutIntField("Board Height", height,1,int.MaxValue);
-			matches = GUILayoutIntField("Number in a row needed",matches,1,Mathf.Max(width,height));
+			GUI.skin = defaultSkin;
+			GUILayout.FlexibleSpace();
+			width = GUILayoutIntField("Board Width",width,1,int.MaxValue, GUILayout.Width(Screen.width/2));
+			height = GUILayoutIntField("Board Height", height,1,int.MaxValue, GUILayout.Width(Screen.width/2));
+			matches = GUILayoutIntField("Number in a row needed",matches,1,Mathf.Max(width,height), GUILayout.Width(Screen.width/2));
 
 			if(GUILayout.Button("Start")) {
 
@@ -101,6 +109,8 @@ public class ConnectK : MonoBehaviour
 			GUILayout.EndVertical();
 		}
 		GUILayout.EndArea();
+
+
 	}
 
 	void StartNewGame()
@@ -275,12 +285,12 @@ public class ConnectK : MonoBehaviour
 		return bottomLeft + new Vector2(x*gridSize,y*gridSize);
 	}
 
-	int GUILayoutIntField(string label, int value, int min, int max)
+	int GUILayoutIntField(string label, int value, int min, int max, params GUILayoutOption[] options)
 	{
 		string strVal = value.ToString();
 		GUILayout.BeginHorizontal();
-		GUILayout.Label (label);
-		strVal = GUILayout.TextField(strVal);
+		GUILayout.Label (label, options);
+		strVal = GUILayout.TextField(strVal, options);
 		GUILayout.EndHorizontal();
 		int returnVal;
 		if(int.TryParse(strVal, out returnVal)) {

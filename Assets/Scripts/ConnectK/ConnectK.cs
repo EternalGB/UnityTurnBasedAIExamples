@@ -32,14 +32,15 @@ public class ConnectK : MonoBehaviour
 	bool gameEnd = false;
 	string[] agentOptions = {"Human", "AI"};
 	int p1AgentSelection = 0, p2AgentSelection = 1;
-	//float p1TimeLimit = 0.1f, p2TimeLimit = 0.1f;
-	//bool p1MultiThreaded = false, p2MultiThreaded = false;
 
 	void Start()
 	{
 		preGame = true;
 	}
 
+	/// <summary>
+	/// Controls the start and end UIs. Very basic default Unity UI stuff
+	/// </summary>
 	void OnGUI()
 	{
 		GUILayout.BeginArea(new Rect(0,Screen.height/3,Screen.width,2*Screen.height/3));
@@ -72,6 +73,10 @@ public class ConnectK : MonoBehaviour
 			GUILayout.EndVertical();
 
 			GUILayout.EndHorizontal();
+
+			width = GUILayoutIntField("Board Width",width,1,int.MaxValue);
+			height = GUILayoutIntField("Board Height", height,1,int.MaxValue);
+			matches = GUILayoutIntField("Number in a row needed",matches,1,Mathf.Max(width,height));
 
 			if(GUILayout.Button("Start")) {
 
@@ -177,7 +182,13 @@ public class ConnectK : MonoBehaviour
 				boardSquares.Add(square);
 			}
 		}
-		//TODO resize camera
+		//resize the camera to see the whole board
+		float cameraWidth = (board.nCols+2)*gridSize;
+		float cameraHeight = (board.nRows+2)*gridSize;
+		if(cameraWidth > cameraHeight*Camera.main.aspect) {
+			cameraHeight = cameraWidth/Camera.main.aspect;
+		}
+		Camera.main.orthographicSize = cameraHeight/2;
 	}
 
 	void DrawBoard()
@@ -257,6 +268,26 @@ public class ConnectK : MonoBehaviour
 	Vector2 GetRealPosition(int x, int y)
 	{
 		return bottomLeft + new Vector2(x*gridSize,y*gridSize);
+	}
+
+	int GUILayoutIntField(string label, int value, int min, int max)
+	{
+		string strVal = value.ToString();
+		GUILayout.BeginHorizontal();
+		GUILayout.Label (label);
+		strVal = GUILayout.TextField(strVal);
+		GUILayout.EndHorizontal();
+		int returnVal;
+		if(int.TryParse(strVal, out returnVal)) {
+			if(returnVal >= min && returnVal <= max)
+				return returnVal;
+			else if(returnVal > max)
+				return max;
+			else
+				return min;
+		} else {
+			return min;
+		}
 	}
 
 }

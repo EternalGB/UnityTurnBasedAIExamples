@@ -11,7 +11,7 @@ public class ConnectKHumanPlayer : TurnAgent
 	
 	public ConnectKPiece player;
 
-	public Sprite buttonImage;
+	public Texture2D buttonImage;
 	ConnectKBoard board;
 	float gridSize = 1;
 	float buttonSize;
@@ -28,12 +28,12 @@ public class ConnectKHumanPlayer : TurnAgent
 	void OnGUI()
 	{
 		if(board != null && ourTurn) {
-			Vector3 topLeft = (new Vector2(-(board.nCols/2) - gridSize/2,board.nRows/2 + gridSize));
+			Vector3 topLeft = (new Vector2(-(board.nCols/2f),board.nRows/2f + gridSize));
 			
 			for(int i = 0; i < board.nCols; i++) {
 				Vector3 offset = new Vector3(gridSize*i,0);
 				Vector3 pos = Camera.main.WorldToScreenPoint(topLeft + offset);
-				if(GUI.Button(new Rect(pos.x,Screen.height - pos.y,buttonSize,buttonSize),buttonImage.texture)) {
+				if(GUI.Button(new Rect(pos.x,Screen.height - pos.y,buttonSize,buttonSize),buttonImage)) {
 					OnTurnReady(new ConnectKTurn(i,player));
 					ourTurn = false;
 				}

@@ -1,0 +1,25 @@
+/*! \mainpage Universal Turn Based AI
+ *
+ * \section what_is What is Universal Turn Based AI?
+ *
+ * Universal Turn Based AI is a general purpose solution for implementing an artificial intelligence player for any turn based game
+ * in Unity. It is essentially a generic implementation of the Minimax algorithm with Alpha-Beta pruning that can be applied to any game domain.
+ * Both a \ref UniversalTurnBasedAI.SingleThreadedTurnEngine "single threaded" and 
+ * \ref UniversalTurnBasedAI.SingleThreadedTurnEngine "multi-threaded" implementation are provided. All the searching and move selection 
+ * is done internally by the \ref UniversalTurnBasedAI.TurnEngine "TurnEngine", so you must
+ * simply provide implementations of \ref UniversalTurnBasedAI.IGameState "IGameState", \ref UniversalTurnBasedAI.ITurn "ITurn" and
+ * \ref UniversalTurnBasedAI.IEvaluator "IEvaluator". This will provide the system with your particular game's domain knowledge,
+ * informing the \ref UniversalTurnBasedAI.TurnEngine "TurnEngine" on how to represent, generate and evaluate game states.
+ *
+ * \image html diagram.png
+ * 
+ * 
+ * \section multi_single Multi-Threaded vs. Single Threaded
+ *
+ * Whilst this system does provide a multi-threaded \ref UniversalTurnBasedAI.TurnEngine "TurnEngine" implementation it may not
+ * perform better than the single threaded implementation for your particular game. This is due to the high overhead of managing
+ * multiple threads. The multi-threaded implementation was included to give users the option to see if it provides better results
+ * for their game's domain. It typically out performs the single threaded implementation for game domains where the search tree is
+ * extremely wide i.e. at each game state there are VERY many possible moves that can be made.
+ *
+ */

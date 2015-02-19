@@ -26,6 +26,7 @@ public class ConnectKAIPlayer : TurnAgent
 		//Register to pass the turn ready even up
 		engine.TurnReadyEvent += HandleTurnReadyEvent;
 	}
+	
 
 	/// <summary>
 	/// Passes the turn ready event up from the TurnEngine 

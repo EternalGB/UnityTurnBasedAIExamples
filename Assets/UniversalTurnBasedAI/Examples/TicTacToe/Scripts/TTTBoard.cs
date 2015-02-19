@@ -36,6 +36,7 @@ public class TTTBoard : IGameState
 		player = oldBoard.player;
 	}
 
+
 	static int[][] lines = new int[][] {
 		new int[] {0,1,2},
 		new int[] {3,4,5},

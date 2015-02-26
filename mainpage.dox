@@ -12,7 +12,23 @@
  * informing the \ref UniversalTurnBasedAI.TurnEngine "TurnEngine" on how to represent, generate and evaluate game states.
  *
  * \image html diagram.png
+ * \image latex diagram.png
  * 
+ * This diagram shows the general structure of the Universal Turn Based AI system. Requests for the next move to be made come in
+ * from the left into the TurnEngine. A request is just the current \ref UniversalTurnBasedAI.IGameState "IGameState" which 
+ * should contain information about which player's turn is next. The request is processed and a turn search is set up to run
+ * in a separate thread.
+ *
+ * The TurnEngine is preconfigured at initialisation to search for a set amount of time, to a certain number of moves ahead
+ * or both. Each \ref UniversalTurnBasedAI.IGameState "IGameState" must be capable of generating each \ref UniversalTurnBasedAI.ITurn "ITurn"
+ * that is possible and valid for that game state and each \ref UniversalTurnBasedAI.ITurn "ITurn" must be capable of converting
+ * its starting game state to a new valid game state. This creates the turn search loop.
+ *
+ * Each new game state is evaluated using an \ref UniversalTurnBasedAI.IEvaluator "IEvaluator" implementation, also provided to the turn engine at
+ * initialisation. The evaluator computes the value of a given game state in terms of how close that game state is to a winning game state for a
+ * particular player. This allows the turn engine to determine which initial moves are better or worse by looking some number of moves ahead and
+ * assuming optimal play by each player where optimal play is defined as: "provides the best value from the IEvaluator implementation".
+ *
  * 
  * \section multi_single Multi-Threaded vs. Single Threaded
  *
